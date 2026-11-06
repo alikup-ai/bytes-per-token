@@ -59,6 +59,8 @@ Levers used, each measured on the board:
 
 The cost model (`costmodel/`) predicts ms/token within 12-14% of the board.
 
+**Full report with interactive charts:** [alikup-ai.github.io/bytes-per-token/report.html](https://alikup-ai.github.io/bytes-per-token/report.html)
+
 ## Prior work this builds on
 
 None of the individual techniques is new; the contribution is putting them together on a
@@ -79,7 +81,7 @@ PSRAM-backed MCU, measuring each one in bytes, and the cost model.
 | `train/` | PyTorch models, QAT training, sweeps, bits/byte comparison |
 | `engine/` | C engine shared by PC and board, ESP-IDF firmware, exporters, tests, browser demo |
 | `decode/` | speculative decoding simulation |
-| `docs/` | experiment log per phase (`phase*.md`), full report (`report.html`) |
+| `docs/` | experiment log per phase (`phase*.md`), full report ([read it online](https://alikup-ai.github.io/bytes-per-token/report.html), source `report.src.html`) |
 
 ## Run it
 

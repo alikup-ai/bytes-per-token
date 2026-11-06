@@ -1,4 +1,4 @@
-<title>LLM на ESP32-S3</title>
+<title>LLM on an ESP32-S3</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
 <style>
@@ -137,245 +137,244 @@ footer { font: 13px/1.6 var(--mono); color: var(--ink-3); border-top: 1px solid 
 <div class="page">
 
 <header class="hero">
-  <div class="eyebrow">mcu-lm-research · сентябрь 2026</div>
-  <h1>Языковая модель на микроконтроллере за $10 — в 3,8–8,2 раза быстрее открытого аналога</h1>
-  <p class="lead">Мы измерили, где на ESP32-S3 теряется время, и переписали выполнение языковой модели под этот чип. На той же плате и тех же весах наш движок выдаёт тот же текст, что и esp32-ai, в несколько раз быстрее. А собственные модели, устроенные под этот чип, пишут лучше их модели при той же скорости.</p>
+  <div class="eyebrow">bytes-per-token · September 2026 · <a href="report.ru.html" style="color:inherit">по-русски</a></div>
+  <h1>A language model on an $8 microcontroller, 3.8–8.2x faster than the open reference port</h1>
+  <p class="lead">We measured where the time goes on an ESP32-S3 and rewrote language-model inference for this chip. On the same board and the same weights our engine produces the same text as esp32-ai, several times faster. Our own models, designed for this chip, write better than theirs at the same speed.</p>
   <div class="kpis">
-    <div class="kpi"><b class="ours num">8,2×</b><span>быстрее esp32-ai: та же модель, та же плата, тот же текст</span></div>
-    <div class="kpi"><b class="num">3,8×</b><span>при полностью одинаковом расчёте (без двухступенчатого выбора слова)</span></div>
-    <div class="kpi"><b class="num">0,63 / 0,86</b><span>бита на байт текста (меньше лучше): наша модель на 8,6 млн параметров против модели esp32-ai на 29 млн; на нашем движке 81 и 94 ток/с в среднем по контексту</span></div>
-    <div class="kpi"><b class="num">0</b><span>расхождений в битах между платой и ПК во всех тестах</span></div>
+    <div class="kpi"><b class="ours num">8.2x</b><span>faster than esp32-ai: same model, same board, same text</span></div>
+    <div class="kpi"><b class="num">3.8x</b><span>with exactly the same computation (no two-stage output layer)</span></div>
+    <div class="kpi"><b class="num">0.63 / 0.86</b><span>bits per byte of text (lower is better): our 8.6M-parameter model vs esp32-ai's 29M; 81 and 94 tok/s on our engine, averaged over the context</span></div>
+    <div class="kpi"><b class="num">0</b><span>bit differences between board and PC across all tests</span></div>
   </div>
-  <div class="sub">ESP32-S3-N16R8 · 2 ядра Xtensa LX7 240 МГц · 512 КБ SRAM · 8 МБ PSRAM · 16 МБ Flash</div>
+  <div class="sub">ESP32-S3-N16R8 · 2 Xtensa LX7 cores at 240 MHz · 512 KB SRAM · 8 MB PSRAM · 16 MB flash</div>
 </header>
 
-<section id="race" aria-label="Гонка">
+<section id="race" aria-label="Race">
   <div class="race">
     <div class="race-head">
-      <h2>Один и тот же текст, одна и та же плата</h2>
-      <span class="small">Скорости реальные: измерены на плате, промпт «Once upon a time», 200 токенов</span>
+      <h2>Same text, same board</h2>
+      <span class="small">Real speeds measured on the board: prompt "Once upon a time", 200 tokens</span>
     </div>
     <div class="lanes">
       <div class="lane theirs">
-        <div class="lane-title"><h3>esp32-ai (их прошивка)</h3><span class="rate">10,6 ток/с</span></div>
+        <div class="lane-title"><h3>esp32-ai (their firmware)</h3><span class="rate">10.6 tok/s</span></div>
         <div class="bar"><i id="barT"></i></div>
         <div class="text" id="txtT"><span class="p">Once upon a time</span></div>
-        <div class="lane-foot"><span id="cntT">0 / 200 токенов</span><span id="timeT">0,0 с</span></div>
+        <div class="lane-foot"><span id="cntT">0 / 200 tokens</span><span id="timeT">0.0 s</span></div>
       </div>
       <div class="lane ours">
-        <div class="lane-title"><h3>Наш движок, та же модель</h3><span class="rate">86,8 ток/с</span></div>
+        <div class="lane-title"><h3>Our engine, same model</h3><span class="rate">86.8 tok/s</span></div>
         <div class="bar"><i id="barO"></i></div>
         <div class="text" id="txtO"><span class="p">Once upon a time</span></div>
-        <div class="lane-foot"><span id="cntO">0 / 200 токенов</span><span id="timeO">0,0 с</span></div>
+        <div class="lane-foot"><span id="cntO">0 / 200 tokens</span><span id="timeO">0.0 s</span></div>
       </div>
     </div>
     <div class="race-foot">
-      <p class="small">Тексты совпадают до символа: 759 из 759. Разница только во времени: <b class="theirs">18,8 с</b> против <b class="ours">2,3 с</b>.</p>
-      <button id="replay" type="button">Запустить заново</button>
+      <p class="small">The texts match character for character: 759 of 759. Only the time differs: <b class="theirs">18.8 s</b> vs <b class="ours">2.3 s</b>.</p>
+      <button id="replay" type="button">Run again</button>
     </div>
   </div>
 </section>
 
 <section id="why">
-  <div class="eyebrow">Главное наблюдение</div>
-  <h2>Скорость упирается в память, а не в вычисления</h2>
-  <p class="lead">Чтобы написать одно слово, модель должна прочитать все свои веса. У чипа три вида памяти с разницей в скорости почти в 10 раз, а векторный блок PIE считает в 21 раз быстрее обычного кода. После его включения процессор в основном ждёт данные.</p>
+  <div class="eyebrow">Key observation</div>
+  <h2>Speed is bound by memory, not by compute</h2>
+  <p class="lead">To write one token the model has to read all of its weights. The chip has three kinds of memory whose speeds differ almost 10x, and the PIE vector unit computes 21x faster than plain code. Once PIE is in use, the processor mostly waits for data.</p>
   <div class="two">
     <div class="figure">
-      <h3>Скорость чтения памяти</h3>
-      <div class="cap">МБ/с, измерено на нашей плате (последовательное чтение, 1 ядро)</div>
+      <h3>Memory read speed</h3>
+      <div class="cap">MB/s measured on our board (sequential read, 1 core)</div>
       <div class="chart" id="chMem"></div>
     </div>
     <div class="figure">
-      <h3>Такты на одно умножение-сложение (int4)</h3>
-      <div class="cap">Меньше лучше. Веса в SRAM, ядро на C против ядра на ассемблере PIE</div>
+      <h3>Cycles per multiply-accumulate (int4)</h3>
+      <div class="cap">Lower is better. Weights in SRAM, C kernel vs PIE assembly kernel</div>
       <div class="chart" id="chPie"></div>
     </div>
   </div>
-  <p>Отсюда правило, которое определило всю работу: <b>ускорение = меньше байт на каждое слово</b>. Байты на слово = бит на вес × доля читаемых весов ÷ слов за одно чтение. Каждый приём ниже уменьшает один из этих множителей.</p>
+  <p>That gives the rule behind all of the work: <b>speedup = fewer bytes per token</b>. Bytes per token = bits per weight × fraction of weights read ÷ tokens per weight pass. Each technique below shrinks one of these factors.</p>
 </section>
 
 <section id="path">
-  <div class="eyebrow">Путь</div>
-  <h2>Что мы сделали, по порядку</h2>
+  <div class="eyebrow">Path</div>
+  <h2>What we did, in order</h2>
   <ol class="steps">
-    <li><div class="when">Этап 0</div><div><h3>Калькулятор скорости чипа</h3><p>Модель затрат по операциям: чтение каждой памяти плюс вычисления. На чужих замерах, которых модель не видела при подгонке, ошибка 3–5% (всего две проверочные точки); на нашем движке она занижает время на 10–14%. Он позволил отбрасывать идеи на бумаге до написания кода.</p></div></li>
-    <li><div class="when">Этап 1</div><div><h3>Замеры платы</h3><p>Собственная прошивка-бенчмарк: скорость SRAM, PSRAM и Flash, ядра PIE, DMA. Выводы: PIE в 21 раз быстрее простого C (в ~13 раз быстрее ядра esp32-ai); после него узкое место — PSRAM (83 МБ/с на двух ядрах); шина PSRAM даёт ~90 МБ/с на всех, поэтому DMA не добавляет пропускной способности.</p></div></li>
-    <li><div class="when">Этап 2</div><div><h3>Эксперименты с устройством модели</h3><p>27 моделей на ноутбуке, каждый сравниваемый вариант в двух запусках (кроме одного повторного 2-битного). Справочник PLE делает модель умнее при том же объёме чтения; ReLU позволяет пропускать 79% нейронов без потерь; обучение под 4 бита почти бесплатно; 4–6 слоёв лучше 12.</p></div></li>
-    <li><div class="when">Этап 3</div><div><h3>Движок на плате</h3><p>C-код, общий для ПК и платы, плюс ассемблерные ядра PIE. Три версии: 70 → 98 → 110 токенов/с на нашей модели. Каждое изменение измерено отдельно; неудачные откатаны и записаны.</p></div></li>
-    <li><div class="when">Сравнение</div><div><h3>Модель esp32-ai на нашем движке</h3><p>Их опубликованные веса без переквантования. Их прошивка и наш движок на одной плате, на их же тесте: 94,1 против 11,5 мс на токен, текст совпадает полностью.</p></div></li>
-    <li><div class="when">Этап 4</div><div><h3>Несколько слов за одно чтение</h3><p>Угадывание следующих слов на этом чипе не окупается (отрицательный результат). Пакетная обработка заранее известных слов (промпт, однозначные куски JSON) даёт ×1,5–2,8.</p></div></li>
-    <li><div class="when">Этап 5</div><div><h3>Своя модель по рецепту</h3><p>Модель затрат, откалиброванная на плате, предсказала скорость вариантов с точностью 1–5%. Лучший вариант (словарь 8192, справочник вдвое шире, 8,6 млн параметров) после обучения на 70 млн токенов даёт 0,63 бита на байт против 0,86 у модели esp32-ai на 29 млн; наша модель на 3,4 млн лучше её при почти той же скорости.</p></div></li>
+    <li><div class="when">Phase 0</div><div><h3>A speed calculator for the chip</h3><p>A per-operation cost model: reads from each memory plus compute. On third-party measurements it was not fitted to, the error is 3–5% (only two check points); on our engine it underestimates time by 10–14%. It let us drop ideas on paper before writing code.</p></div></li>
+    <li><div class="when">Phase 1</div><div><h3>Board measurements</h3><p>Our own benchmark firmware: SRAM, PSRAM and flash speed, PIE kernels, DMA. Findings: PIE is 21x faster than plain C (~13x faster than esp32-ai's kernel); after it the bottleneck is PSRAM (83 MB/s on two cores); the PSRAM bus gives ~90 MB/s in total, so DMA adds no bandwidth.</p></div></li>
+    <li><div class="when">Phase 2</div><div><h3>Model architecture experiments</h3><p>27 models trained on a laptop, every compared variant in two runs (except one repeated 2-bit run). Per-layer embeddings (PLE) make the model smarter for the same bytes read; ReLU lets 79% of neurons be skipped at no cost; training for 4 bits is almost free; 4–6 layers beat 12.</p></div></li>
+    <li><div class="when">Phase 3</div><div><h3>The engine on the board</h3><p>C code shared by PC and board, plus PIE assembly kernels. Three versions: 70 → 98 → 110 tokens/s on our model. Every change was measured on its own; failed ones were reverted and logged.</p></div></li>
+    <li><div class="when">Comparison</div><div><h3>esp32-ai's model on our engine</h3><p>Their published weights, not requantized. Their firmware and our engine on one board, on their own benchmark: 94.1 vs 11.5 ms per token, identical text.</p></div></li>
+    <li><div class="when">Phase 4</div><div><h3>Several tokens per weight pass</h3><p>Speculative decoding does not pay on this chip (negative result). Batching tokens known in advance (the prompt, unambiguous pieces of JSON) gives 1.5–2.8x.</p></div></li>
+    <li><div class="when">Phase 5</div><div><h3>Our own model, by the recipe</h3><p>The cost model, calibrated on the board, predicted the speed of the variants within 1–5%. The best variant (vocabulary 8192, PLE table twice as wide, 8.6M parameters), trained on 70M tokens, reaches 0.63 bits per byte vs 0.86 for esp32-ai's 29M model; our 3.4M model already beats it at almost the same speed.</p></div></li>
   </ol>
 </section>
 
 <section id="models">
-  <div class="eyebrow">Модели</div>
-  <h2>Как сделать модель умнее, не читая больше</h2>
+  <div class="eyebrow">Models</div>
+  <h2>Making a model smarter without reading more</h2>
   <div class="figure">
-    <h3>Качество при одинаковом объёме чтения на слово (~900 КБ)</h3>
-    <div class="cap">Ошибка на отложенных текстах (val loss), меньше лучше. Две точки на модель — два независимых запуска.</div>
-    <div class="legend"><span><i style="background:var(--ink-3)"></i>обычная и урезанная</span><span><i style="background:var(--s3)"></i>с экспертами (MoE)</span><span><i style="background:var(--ours)"></i>со справочником (PLE)</span></div>
+    <h3>Quality at the same bytes read per token (~900 KB)</h3>
+    <div class="cap">Loss on held-out text (val loss), lower is better. Two dots per model: two independent runs.</div>
+    <div class="legend"><span><i style="background:var(--ink-3)"></i>dense and trimmed</span><span><i style="background:var(--s3)"></i>mixture of experts (MoE)</span><span><i style="background:var(--ours)"></i>per-layer embeddings (PLE)</span></div>
     <div class="chart" id="chH2"></div>
   </div>
   <div class="tbl"><table>
-    <thead><tr><th>Приём</th><th>Качество (val loss)</th><th>Скорость (плата или модель затрат)</th><th>Итог</th></tr></thead>
+    <thead><tr><th>Technique</th><th>Quality (val loss)</th><th>Speed (board or cost model)</th><th>Verdict</th></tr></thead>
     <tbody>
-      <tr class="hl"><td>Справочник PLE: таблица на слово во Flash, читается одна строка</td><td class="n">−0,022…−0,039</td><td class="n">+0,5 мс, плата</td><td><span class="pill">работает</span></td></tr>
-      <tr class="hl"><td>ReLU вместо SwiGLU и пропуск молчащих нейронов (79%)</td><td class="n">−0,002</td><td class="n">×1,3, плата</td><td><span class="pill">работает</span></td></tr>
-      <tr class="hl"><td>Обучение сразу под 4 бита (QAT)</td><td class="n">+0,024</td><td class="n">~7× меньше байт, чем fp32 (с масштабами)</td><td><span class="pill">работает</span></td></tr>
-      <tr><td>Эксперты MoE (4 эксперта, читается 1)</td><td class="n">−0,009</td><td class="n">≈, модель затрат</td><td><span class="pill neg">слабо</span></td></tr>
-      <tr><td>2 бита при том же размере (при вдвое большем числе весов и том же объёме чтения: +0,13)</td><td class="n">+0,305</td><td class="n">×1,5, модель затрат (на плате не запускали)</td><td><span class="pill neg">дорого по качеству</span></td></tr>
-      <tr><td>12 слоёв вместо 6</td><td class="n">+0,069</td><td class="n">−15%, модель затрат</td><td><span class="pill neg">хуже по обоим</span></td></tr>
+      <tr class="hl"><td>PLE: a per-token table in flash, one row read per token</td><td class="n">−0.022…−0.039</td><td class="n">+0.5 ms, board</td><td><span class="pill">works</span></td></tr>
+      <tr class="hl"><td>ReLU instead of SwiGLU, skipping silent neurons (79%)</td><td class="n">−0.002</td><td class="n">1.3x, board</td><td><span class="pill">works</span></td></tr>
+      <tr class="hl"><td>Training for 4 bits from the start (QAT)</td><td class="n">+0.024</td><td class="n">~7x fewer bytes than fp32 (incl. scales)</td><td><span class="pill">works</span></td></tr>
+      <tr><td>Mixture of experts (4 experts, 1 read)</td><td class="n">−0.009</td><td class="n">≈, cost model</td><td><span class="pill neg">weak</span></td></tr>
+      <tr><td>2 bits at the same size (with twice the weights and the same bytes read: +0.13)</td><td class="n">+0.305</td><td class="n">1.5x, cost model (not run on the board)</td><td><span class="pill neg">too costly in quality</span></td></tr>
+      <tr><td>12 layers instead of 6</td><td class="n">+0.069</td><td class="n">−15%, cost model</td><td><span class="pill neg">worse on both</span></td></tr>
     </tbody>
   </table></div>
-  <p class="small">Итоговая модель combo = PLE + ReLU + 4 бита: val loss 2,010 против 2,024 у обычной 4-битной (среднее двух запусков, лучше в обоих), и на 22% быстрее её на плате (98 против 80 ток/с, движок v2).</p>
+  <p class="small">The combined model combo = PLE + ReLU + 4 bits: val loss 2.010 vs 2.024 for a plain 4-bit model (mean of two runs, better in both), and 22% faster on the board (98 vs 80 tok/s, engine v2).</p>
 
-  <h3>Рецепт против чужой модели: одинаковый текст, одна плата</h3>
-  <p>Модели с разными словарями сравниваются в битах на байт текста: сколько информации модели не хватает, чтобы предсказать каждый байт. Первые 5000 отложенных историй, каждая модель со своим токенизатором и со своими 4-битными весами, как их выполняет движок. Скорость — среднее по всему контексту 256 на нашем движке (двухступенчатый выбор слова, PSRAM 80 МГц).</p>
+  <h3>The recipe against someone else's model: same text, same board</h3>
+  <p>Models with different vocabularies are compared in bits per byte of text: how much information the model is missing to predict each byte. First 5,000 held-out stories, each model with its own tokenizer and its own 4-bit weights, as the engine runs them. Speed is the mean over the whole 256-token context on our engine (two-stage output layer, PSRAM 80 MHz).</p>
   <div class="tbl"><table>
-    <thead><tr><th>Модель</th><th>Параметров</th><th>Бит на байт</th><th>ток/с (среднее, плата)</th></tr></thead>
+    <thead><tr><th>Model</th><th>Parameters</th><th>Bits per byte</th><th>tok/s (mean, board)</th></tr></thead>
     <tbody>
-      <tr><td>esp32-ai TinyStories (их открытая модель)</td><td class="n">28,9 млн</td><td class="n">0,863</td><td class="n">~94</td></tr>
-      <tr class="hl"><td>combo (наша: PLE + ReLU + 4 бита)</td><td class="n">3,4 млн</td><td class="n">0,732</td><td class="n">~91</td></tr>
-      <tr class="hl"><td>справочник PLE вдвое шире</td><td class="n">4,9 млн</td><td class="n">0,716</td><td class="n">~84 (прошлая версия движка)</td></tr>
-      <tr class="hl"><td>словарь 8192 + справочник вдвое шире</td><td class="n">8,6 млн</td><td class="n">0,704</td><td class="n">~81</td></tr>
-      <tr class="hl"><td>то же, обучение на 70 млн токенов вместо 20</td><td class="n">8,6 млн</td><td class="n"><b>0,625</b></td><td class="n">~81</td></tr>
-      <tr><td>словарь 16384 + справочник вдвое шире</td><td class="n">16,0 млн</td><td class="n">0,706</td><td class="n">— (прогноз ~74)</td></tr>
+      <tr><td>esp32-ai TinyStories (their open model)</td><td class="n">28.9M</td><td class="n">0.863</td><td class="n">~94</td></tr>
+      <tr class="hl"><td>combo (ours: PLE + ReLU + 4 bits)</td><td class="n">3.4M</td><td class="n">0.732</td><td class="n">~91</td></tr>
+      <tr class="hl"><td>PLE table twice as wide</td><td class="n">4.9M</td><td class="n">0.716</td><td class="n">~84 (previous engine version)</td></tr>
+      <tr class="hl"><td>vocabulary 8192 + PLE twice as wide</td><td class="n">8.6M</td><td class="n">0.704</td><td class="n">~81</td></tr>
+      <tr class="hl"><td>same, trained on 70M tokens instead of 20M</td><td class="n">8.6M</td><td class="n"><b>0.625</b></td><td class="n">~81</td></tr>
+      <tr><td>vocabulary 16384 + PLE twice as wide</td><td class="n">16.0M</td><td class="n">0.706</td><td class="n">— (predicted ~74)</td></tr>
     </tbody>
   </table></div>
-  <p class="small">Проверка честности: наша оценка их модели (2,45 нат на токен) совпадает с тем, что авторы сами публикуют (перплексия 11,4 до квантования, «~+1» после). У их модели почти все параметры — словарь на 32 тыс. токенов и справочник, а ядро всего 0,56 млн; на детских историях такой словарь почти не используется, а наш вариант со словарём 16384 показал, что справочник насыщается. Их модель мы запускаем только на нашем движке: их прошивка выполняет её со скоростью 10,6 ток/с и наши модели запустить не может.</p>
+  <p class="small">Fairness check: our score for their model (2.45 nats per token) matches what its authors publish (perplexity 11.4 before quantization, "~+1" after). Almost all of their parameters are a 32k-token vocabulary and the PLE table, with a trunk of only 0.56M; children's stories barely use such a vocabulary, and our 16384-vocabulary variant showed that the PLE table saturates. We run their model only on our engine: their firmware runs it at 10.6 tok/s and cannot run our models.</p>
 </section>
 
 <section id="engine">
-  <div class="eyebrow">Движок</div>
-  <h2>Где время уходит у них и у нас</h2>
+  <div class="eyebrow">Engine</div>
+  <h2>Where the time goes, theirs and ours</h2>
   <div class="figure">
-    <h3>Разбивка времени на один токен, одна и та же модель esp32-ai</h3>
-    <div class="cap">мс на токен по стадиям, их тест (200 токенов). Профиль esp32-ai — их собственный вывод на нашей плате.</div>
+    <h3>Time per token by stage, the same esp32-ai model</h3>
+    <div class="cap">ms per token by stage, their benchmark (200 tokens). The esp32-ai profile is their own output on our board.</div>
     <div class="legend" id="lgStage"></div>
     <div class="chart" id="chStage"></div>
   </div>
   <div class="cards">
-    <div class="card"><b class="big">4 бита + PIE</b><p>Веса хранятся в 4 битах и распаковываются векторными командами. У esp32-ai 8 бит и обычный C: вдвое больше байт и в ~13 раз больше тактов на операцию (6,2 против 0,47).</p></div>
-    <div class="card"><b class="big">15% строк</b><p>Двухступенчатый выбор слова: 256 групп слов, сначала оценка групп, потом полный расчёт только лучших. Совпадает с полным выбором в 99,4–99,8% позиций; прочитанные строки побитово равны полному расчёту.</p></div>
-    <div class="card"><b class="big">2 ядра</b><p>Каждое умножение делится пополам между ядрами, второе ядро ждёт работу в активном цикле: передача задачи стоит 83–93 такта.</p></div>
-    <div class="card"><b class="big">SRAM</b><p>Сначала буферы движка, затем самые читаемые веса в быструю внутреннюю память (~210 КБ), остальное в PSRAM, таблица PLE остаётся во Flash.</p></div>
-    <div class="card"><b class="big">48% FFN</b><p>ReLU «сначала ворота»: считаем ворота, а две другие матрицы читаем только для живых нейронов. Новое ядро на аккумуляторе QACC для транспонированной матрицы.</p></div>
-    <div class="card"><b class="big">−1 мс</b><p>Работа вне умножений: квантование, GELU по таблице, выбор групп. По профилю, а не наугад, сжали её с 2,2 до 1,2 мс на токен.</p></div>
+    <div class="card"><b class="big">4 bits + PIE</b><p>Weights are stored in 4 bits and unpacked by vector instructions. esp32-ai uses 8 bits and plain C: twice the bytes and ~13x more cycles per operation (6.2 vs 0.47).</p></div>
+    <div class="card"><b class="big">15% of rows</b><p>Two-stage output layer: 256 clusters of tokens, score the clusters first, then compute only the best ones in full. Agrees with the full output layer at 99.4–99.8% of positions; the rows that are read match the full computation bit for bit.</p></div>
+    <div class="card"><b class="big">2 cores</b><p>Every matrix-vector product is split between the cores; the second core spins waiting for work, so handing it a job costs 83–93 cycles.</p></div>
+    <div class="card"><b class="big">SRAM</b><p>Engine buffers first, then the most-read weights go to fast internal memory (~210 KB), the rest to PSRAM; the PLE table stays in flash.</p></div>
+    <div class="card"><b class="big">48% of FFN</b><p>ReLU "gate first": compute the gate, then read the other two matrices only for live neurons. A new kernel on the QACC accumulator for the transposed matrix.</p></div>
+    <div class="card"><b class="big">−1 ms</b><p>Work outside the matrix products: quantization, GELU by table, cluster selection. Guided by the profile, not guesses, it went from 2.2 to 1.2 ms per token.</p></div>
   </div>
   <div class="figure">
-    <h3>Рост скорости движка на нашей модели combo</h3>
-    <div class="cap">Токенов в секунду, 2 ядра, генерация после короткого промпта</div>
+    <h3>Engine speed over versions, our combo model</h3>
+    <div class="cap">Tokens per second, 2 cores, generation after a short prompt</div>
     <div class="chart" id="chProg"></div>
   </div>
 </section>
 
 <section id="versus">
-  <div class="eyebrow">Честное сравнение</div>
-  <h2>Одна плата, одна модель, один тест</h2>
-  <p>Прошивку esp32-ai мы собрали их способом (arduino-cli, -O3, их раздел Flash) и измерили на нашей плате. Отпечаток модели a9bdd778 совпал с их метаданными, три прогона дали одно и то же значение. Их собственная опубликованная цифра — 94,9 мс, наш замер — 94,1 мс.</p>
+  <div class="eyebrow">A fair comparison</div>
+  <h2>One board, one model, one benchmark</h2>
+  <p>We built esp32-ai's firmware their way (arduino-cli, -O3, their flash partition) and measured it on our board. The model fingerprint a9bdd778 matched their metadata, and three runs gave the same value. Their own published figure is 94.9 ms; we measured 94.1 ms.</p>
   <div class="figure">
-    <h3>мс на токен, модель esp32-ai (29 млн параметров), позиции 4–203</h3>
-    <div class="cap">Меньше лучше</div>
+    <h3>ms per token, esp32-ai model (29M parameters), positions 4–203</h3>
+    <div class="cap">Lower is better</div>
     <div class="chart" id="chVs"></div>
   </div>
   <div class="tbl"><table>
-    <thead><tr><th>Движок</th><th>Выбор слова</th><th>PSRAM</th><th>мс/токен</th><th>ток/с</th><th>Ускорение</th></tr></thead>
+    <thead><tr><th>Engine</th><th>Output layer</th><th>PSRAM</th><th>ms/token</th><th>tok/s</th><th>Speedup</th></tr></thead>
     <tbody>
-      <tr><td>esp32-ai</td><td>полный, 8 бит</td><td class="n">80 МГц</td><td class="n">94,10</td><td class="n">10,6</td><td class="n">1×</td></tr>
-      <tr class="hl"><td>наш</td><td>полный, 4 бита</td><td class="n">80 МГц</td><td class="n">25,00</td><td class="n">40,0</td><td class="n">3,8×</td></tr>
-      <tr class="hl"><td>наш</td><td>двухступенчатый</td><td class="n">80 МГц</td><td class="n">11,52</td><td class="n">86,8</td><td class="n">8,2×</td></tr>
-      <tr><td>наш</td><td>полный</td><td class="n">120 МГц*</td><td class="n">18,90</td><td class="n">52,9</td><td class="n">5,0×</td></tr>
-      <tr><td>наш</td><td>двухступенчатый</td><td class="n">120 МГц*</td><td class="n">9,17</td><td class="n">109,0</td><td class="n">10,3×</td></tr>
+      <tr><td>esp32-ai</td><td>full, 8-bit</td><td class="n">80 MHz</td><td class="n">94.10</td><td class="n">10.6</td><td class="n">1x</td></tr>
+      <tr class="hl"><td>ours</td><td>full, 4-bit</td><td class="n">80 MHz</td><td class="n">25.00</td><td class="n">40.0</td><td class="n">3.8x</td></tr>
+      <tr class="hl"><td>ours</td><td>two-stage</td><td class="n">80 MHz</td><td class="n">11.52</td><td class="n">86.8</td><td class="n">8.2x</td></tr>
+      <tr><td>ours</td><td>full</td><td class="n">120 MHz*</td><td class="n">18.90</td><td class="n">52.9</td><td class="n">5.0x</td></tr>
+      <tr><td>ours</td><td>two-stage</td><td class="n">120 MHz*</td><td class="n">9.17</td><td class="n">109.0</td><td class="n">10.3x</td></tr>
     </tbody>
   </table></div>
-  <p class="small">* PSRAM на 120 МГц в ESP-IDF помечена как экспериментальная: «работает при стабильной температуре». Замер при комнатной температуре, сбоев не было.</p>
+  <p class="small">* PSRAM at 120 MHz is marked experimental in ESP-IDF ("works at a stable temperature"). Measured at room temperature, no faults seen.</p>
 </section>
 
 <section id="negative">
-  <div class="eyebrow">Что не сработало</div>
-  <h2>Отрицательные результаты тоже измерены</h2>
+  <div class="eyebrow">What did not work</div>
+  <h2>Negative results are measured too</h2>
   <div class="tbl"><table>
-    <thead><tr><th>Идея</th><th>Ожидание</th><th>Замер</th><th>Почему</th></tr></thead>
+    <thead><tr><th>Idea</th><th>Expected</th><th>Measured</th><th>Why</th></tr></thead>
     <tbody>
-      <tr><td>Угадывать 2–4 следующих слова и проверять за одно чтение</td><td class="n">×1,3 по калькулятору</td><td class="n">×0,8–1,05</td><td>после оптимизаций треть времени — вычисления на каждое слово; угадчик даёт лишь 1,4–1,6 слова за проход</td></tr>
-      <tr><td>DMA подгружает веса, пока ядро считает</td><td class="n">−30%</td><td class="n">не быстрее</td><td>шина PSRAM даёт ~90 МБ/с на всех; DMA (77 МБ/с) только делит её с ядрами, а два ядра сами читают 83</td></tr>
-      <tr><td>Масштабы весов в 16 битах вместо 32</td><td class="n">−6% байт</td><td class="n">+5% времени</td><td>перевод 8192 чисел за слово дороже сэкономленного чтения</td></tr>
-      <tr><td>Держать последние значения внимания в SRAM</td><td class="n">−1 мс</td><td class="n">−0,06 мс внимание</td><td>тормозили не записи, а задержки чтения PSRAM (всего вышло −0,39 мс, остаток не объяснён)</td></tr>
-      <tr><td>Веса из генератора «зёрен» (SeedLM), сжатие весов</td><td class="n">выигрыш на GPU</td><td class="n">проигрыш на бумаге</td><td>на чипе нет лишних тактов: распаковка дороже чтения</td></tr>
+      <tr><td>Guess 2–4 next tokens and verify them in one weight pass</td><td class="n">1.3x by the calculator</td><td class="n">0.8–1.05x</td><td>after the optimizations a third of the time is per-token compute; the drafter yields only 1.4–1.6 tokens per pass</td></tr>
+      <tr><td>DMA prefetches weights while the core computes</td><td class="n">−30%</td><td class="n">no faster</td><td>the PSRAM bus gives ~90 MB/s in total; DMA (77 MB/s) only shares it with the cores, and two cores already read 83</td></tr>
+      <tr><td>16-bit weight scales instead of 32-bit</td><td class="n">−6% bytes</td><td class="n">+5% time</td><td>converting 8192 numbers per token costs more than the read it saves</td></tr>
+      <tr><td>Keep recent attention values in SRAM</td><td class="n">−1 ms</td><td class="n">−0.06 ms attention</td><td>the writes were not the bottleneck, PSRAM read latency was (−0.39 ms in total, the rest unexplained)</td></tr>
+      <tr><td>Weights from a seed generator (SeedLM), weight compression</td><td class="n">a win on GPUs</td><td class="n">a loss on paper</td><td>the chip has no spare cycles: decompression costs more than the read</td></tr>
     </tbody>
   </table></div>
 </section>
 
 <section id="novelty">
-  <div class="eyebrow">Новизна</div>
-  <h2>Чем проект отличается от существующих</h2>
+  <div class="eyebrow">Prior work</div>
+  <h2>How this project differs from existing ones</h2>
   <div class="tbl"><table>
-    <thead><tr><th>Проект</th><th>Где работает модель</th><th>Скорость на ESP32-S3</th><th>Что есть</th><th>Чего нет</th></tr></thead>
+    <thead><tr><th>Project</th><th>Where the model runs</th><th>Speed on ESP32-S3</th><th>Has</th><th>Lacks</th></tr></thead>
     <tbody>
-      <tr class="hl"><td><b>Этот проект</b></td><td>ESP32-S3, полностью автономно</td><td class="n">87–110 ток/с (29 млн), 110–134 (2 млн); в конце контекста ~72</td><td>PIE-ядра, 2 ядра, двухступенчатый выбор слова, разреженный FFN, пакеты, модель затрат, побитовая проверка</td><td>прикладная модель (пока детские рассказы)</td></tr>
-      <tr><td>slvDev/esp32-ai</td><td>ESP32-S3</td><td class="n">10,6 ток/с (измерено нами)</td><td>модели TinyStories и Barista, PLE</td><td>PIE, 4-битное выполнение, пропуск работы</td></tr>
-      <tr><td>esp32-tinyLLM (Rust)</td><td>ESP32-S3</td><td class="n">~10,5 ток/с (их данные)</td><td>методика бит-в-бит проверок</td><td>векторный блок, большие выигрыши по байтам</td></tr>
-      <tr><td>Порты Needle (вызов команд)</td><td>ESP32-S3</td><td class="n">~1,5 ток/с (их данные)</td><td>вызов инструментов по схеме</td><td>скорость</td></tr>
-      <tr><td>Deeploy (компилятор)</td><td>RISC-V MCU с NPU</td><td class="n">—</td><td>тайлинг, DMA, малые LLM</td><td>ESP32 / Xtensa PIE</td></tr>
+      <tr class="hl"><td><b>This project</b></td><td>ESP32-S3, fully offline</td><td class="n">87–110 tok/s (29M), 110–134 (2M); ~72 at the end of the context</td><td>PIE kernels, 2 cores, two-stage output layer, sparse FFN, batching, cost model, bit-exact checks</td><td>an applied model (children's stories so far)</td></tr>
+      <tr><td>slvDev/esp32-ai</td><td>ESP32-S3</td><td class="n">10.6 tok/s (measured by us)</td><td>TinyStories and Barista models, PLE</td><td>PIE, 4-bit execution, work skipping</td></tr>
+      <tr><td>esp32-tinyLLM (Rust)</td><td>ESP32-S3</td><td class="n">~10.5 tok/s (their figure)</td><td>bit-exact test methodology</td><td>vector unit, large byte savings</td></tr>
+      <tr><td>Needle ports (tool calling)</td><td>ESP32-S3</td><td class="n">~1.5 tok/s (their figure)</td><td>schema-based tool calls</td><td>speed</td></tr>
+      <tr><td>Deeploy (compiler)</td><td>RISC-V MCU with NPU</td><td class="n">—</td><td>tiling, DMA, small LMs</td><td>ESP32 / Xtensa PIE</td></tr>
     </tbody>
   </table></div>
   <div class="cards">
-    <div class="card"><h3>1. Самый быстрый известный нам запуск LLM на ESP32-S3</h3><p>На тех же весах и с тем же текстом: 3,8× при одинаковом расчёте и 8,2× с двухступенчатым выбором слова. Других открытых движков с PIE для LLM мы не нашли.</p></div>
-    <div class="card"><h3>2. Модели, устроенные под чип</h3><p>Сравнение устройств моделей при одинаковом объёме чтения на токен и проверка на плате. Наша модель на 3,4 млн параметров пишет лучше открытой модели esp32-ai на 29 млн при почти той же скорости на нашем движке (0,73 против 0,86 бита на байт), а лучшая – 0,63.</p></div>
-    <div class="card"><h3>3. Приёмы серверного мира, проверенные на MCU</h3><p>Двухступенчатый выбор слова, пропуск неактивных нейронов и пакетная обработка известных токенов на микроконтроллере в найденных источниках не встречались. Мы показали, какие из них работают, а какие вредят, и почему.</p></div>
-    <div class="card"><h3>4. Методика, которой можно доверять</h3><p>Модель затрат с проверкой на чужих данных, побитовое совпадение ПК и платы, проверка каждого ядра против эталона на C, повтор каждого эксперимента.</p></div>
+    <div class="card"><h3>1. The fastest LLM inference on ESP32-S3 we know of</h3><p>On the same weights and the same text: 3.8x with identical computation and 8.2x with the two-stage output layer. We found no other open LLM engine using PIE.</p></div>
+    <div class="card"><h3>2. Models designed for the chip</h3><p>Architectures compared at equal bytes read per token and checked on the board. Our 3.4M model writes better than esp32-ai's open 29M model at almost the same speed on our engine (0.73 vs 0.86 bits per byte); the best one reaches 0.63.</p></div>
+    <div class="card"><h3>3. Server-side techniques tested on an MCU</h3><p>The ideas come from server and mobile LLM inference: <a href="https://arxiv.org/abs/1810.12406">candidate screening for the output layer</a>, <a href="https://arxiv.org/abs/2310.04564">ReLU activation sparsity</a> and reading only active rows (<a href="https://arxiv.org/abs/2312.11514">LLM in a flash</a>), <a href="https://ai.google.dev/gemma/docs/3n">per-layer embeddings</a>. We did not find them measured on a microcontroller, and show which help here, which hurt, and why.</p></div>
+    <div class="card"><h3>4. A method you can check</h3><p>A cost model validated on data it was not fitted to, bit-exact agreement between PC and board, every kernel checked against a C reference, every experiment repeated.</p></div>
   </div>
-  <p class="small">«Не нашли» означает поиск по GitHub, Hugging Face, arXiv и патентам; это не доказательство отсутствия.</p>
+  <p class="small">"Not found" means a search of GitHub, Hugging Face, arXiv and patents; it is not proof of absence.</p>
 </section>
 
 <section id="verify">
-  <div class="eyebrow">Проверка</div>
-  <h2>Почему цифрам можно верить</h2>
+  <div class="eyebrow">Verification</div>
+  <h2>Why the numbers can be trusted</h2>
   <div class="cards">
-    <div class="card"><b class="big">бит в бит</b><p>ПК, плата с PIE на двух ядрах, на одном ядре и на обычном C дают одинаковые отпечатки всех токенов и всех логитов в каждом прогоне.</p></div>
-    <div class="card"><b class="big">±0,003</b><p>Ошибка модели на отложенном тексте в движке отличается от PyTorch не больше чем на 0,003. Выбор слова совпадает в 98–99% позиций; расхождения только на почти равных вариантах.</p></div>
-    <div class="card"><b class="big">&lt;0,1%</b><p>Разброс между повторами одного и того же прогона. Это не погрешность по разным текстам: от начала к концу контекста скорость падает в 1,6 раза. Все замеры сохранены в логах в репозитории.</p></div>
+    <div class="card"><b class="big">bit for bit</b><p>PC, the board with PIE on two cores, on one core, and in plain C give identical digests of all tokens and all logits in every run.</p></div>
+    <div class="card"><b class="big">±0.003</b><p>The engine's loss on held-out text differs from PyTorch by at most 0.003. The chosen token matches at 98–99% of positions; differences only at near-ties.</p></div>
+    <div class="card"><b class="big">&lt;0.1%</b><p>Spread between repeats of the same run. This is not the spread across texts: speed drops 1.6x from the start to the end of the context. All measurements are kept as logs in the repository.</p></div>
   </div>
 </section>
 
 <section id="demo">
-  <div class="eyebrow">Живое демо</div>
-  <h2>Попробуйте сами</h2>
+  <div class="eyebrow">Live demo</div>
+  <h2>Try it yourself</h2>
   <div class="demo">
     <div style="display:grid; gap:14px">
-      <p>Плата с моделью esp32-ai и нашим движком подключается к любому компьютеру по USB. Страница в Chrome или Edge подключается к плате напрямую, без установки программ. Вы пишете начало истории, плата дописывает её в реальном времени, на экране видна скорость каждого токена.</p>
+      <p>An ESP32-S3-N16R8 board connects to any computer over USB. A page in Chrome or Edge flashes the board and then talks to it directly, nothing to install. You type the start of a story, the board continues it in real time, and the page shows the time of every token.</p>
       <ol class="plain">
-        <li>Подключите плату кабелем к разъёму COM.</li>
-        <li>Откройте <span class="mono">engine/demo/index.html</span> в Chrome или Edge.</li>
-        <li>«Подключить плату» → выберите порт CH343.</li>
-        <li>Введите начало истории по-английски → «Написать».</li>
+        <li>Connect the board with a cable to the COM (UART) USB port.</li>
+        <li>Open <a href="https://alikup-ai.github.io/bytes-per-token/">alikup-ai.github.io/bytes-per-token</a> in Chrome or Edge.</li>
+        <li>Press a Flash button, wait about a minute, close the flasher and reload the page.</li>
+        <li>"Connect board" → type the start of an English story → "Write".</li>
       </ol>
-      <p class="small">Все модели учились на детских рассказах. Для историй лучше всего наша модель со словарём 8192 (varC); модель esp32-ai тоже поддерживается; дообученная combo_qa ещё отвечает на простые вопросы по сказке (режим «Вопрос по сказке», docs/qa-finetune.md). Модель меняется прошивкой одного файла: engine/demo/flash_demo.sh.</p>
+      <p class="small">All models were trained on children's stories. Two images are offered: our varC model (8.6M, 0.63 bits per byte) and esp32-ai's model on our engine. The serial protocol is in engine/demo/README.md.</p>
     </div>
-    <pre class="code">ПК  → G 120 700 40 &lt;seed&gt; 0 7 433 447 259 405 …
-плата → P 29.6
-плата → T 11 10320
-плата → T 612 10288
+    <pre class="code">PC    → G 120 700 40 &lt;seed&gt; 0 7 433 447 259 405 …
+board → P 29.6
+board → T 11 10320
+board → T 612 10288
 …
-плата → E 120 10.32</pre>
+board → E 120 10.32</pre>
   </div>
 </section>
 
 <section id="next">
-  <h2>Ограничения</h2>
-  <p class="small">Модели маленькие (3–29 млн параметров) и обучены на детских рассказах, 20 млн токенов на модель, один LR для всех; сравнение качества с esp32-ai — на тексте нашего распределения (их оценка при этом совпала с их собственной); скорость зависит от длины контекста («110 ток/с» — позиции 13–60; сравнение с esp32-ai — на их тесте, позиции 4–203); режим PSRAM 120 МГц экспериментальный; энергия на токен не измерялась, второе ядро занято активным ожиданием; версия ядра Arduino при замере esp32-ai — 3.3.3 (у авторов 3.3.10).</p>
+  <h2>Limitations</h2>
+  <p class="small">The models are small (3–29M parameters) and trained on children's stories, 20M tokens per model (70M for the best one), one learning rate for all; the quality comparison with esp32-ai uses text from our distribution (their score on it matches their own); speed depends on context length ("110 tok/s" is positions 13–60; the esp32-ai comparison uses their benchmark, positions 4–203); PSRAM at 120 MHz is experimental; energy per token was not measured, and the second core busy-waits; the Arduino core version for the esp32-ai measurement was 3.3.3 (the authors used 3.3.10).</p>
 </section>
 
-<footer>mcu-lm-research · репозиторий: docs/ (этапы 0–4), engine/ (движок и демо), bench/ (замеры) · все цифры измерены на ESP32-S3-N16R8</footer>
+<footer>bytes-per-token · <a href="https://github.com/alikup-ai/bytes-per-token" style="color:inherit">github.com/alikup-ai/bytes-per-token</a> · docs/ (phases 0–4), engine/ (engine and demo), bench/ (measurements) · every number measured on ESP32-S3-N16R8</footer>
 </div>
 <div id="tip" hidden></div>
-
 <script>
 const RACE = __RACE__;
 const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-const fmt = (x, d = 1) => x.toLocaleString("ru-RU", { minimumFractionDigits: d, maximumFractionDigits: d });
+const fmt = (x, d = 1) => x.toLocaleString("en-US", { minimumFractionDigits: d, maximumFractionDigits: d });
 
 /* ---------- race ---------- */
 (function race() {
@@ -393,8 +392,8 @@ const fmt = (x, d = 1) => x.toLocaleString("ru-RU", { minimumFractionDigits: d, 
       L.span = document.createElement("span");
       box.appendChild(L.span);
       document.getElementById("bar" + L.id).style.width = "0%";
-      document.getElementById("cnt" + L.id).textContent = "0 / " + N + " токенов";
-      document.getElementById("time" + L.id).textContent = "0,0 с";
+      document.getElementById("cnt" + L.id).textContent = "0 / " + N + " tokens";
+      document.getElementById("time" + L.id).textContent = "0.0 s";
     }
   }
   function frame(now) {
@@ -408,10 +407,10 @@ const fmt = (x, d = 1) => x.toLocaleString("ru-RU", { minimumFractionDigits: d, 
         const box = document.getElementById("txt" + L.id);
         box.scrollTop = box.scrollHeight;
         document.getElementById("bar" + L.id).style.width = (100 * L.i / N) + "%";
-        document.getElementById("cnt" + L.id).textContent = L.i + " / " + N + " токенов";
+        document.getElementById("cnt" + L.id).textContent = L.i + " / " + N + " tokens";
       }
-      if (L.i < N) { busy = true; document.getElementById("time" + L.id).textContent = fmt(el) + " с"; }
-      else if (!L.done) { L.done = true; document.getElementById("time" + L.id).textContent = fmt(N / L.rate) + " с"; }
+      if (L.i < N) { busy = true; document.getElementById("time" + L.id).textContent = fmt(el) + " s"; }
+      else if (!L.done) { L.done = true; document.getElementById("time" + L.id).textContent = fmt(N / L.rate) + " s"; }
     }
     if (busy) raf = requestAnimationFrame(frame);
   }
@@ -424,7 +423,7 @@ const fmt = (x, d = 1) => x.toLocaleString("ru-RU", { minimumFractionDigits: d, 
   reset();
   if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
     for (const L of lanes) { L.span.textContent = RACE.tokens.join(""); document.getElementById("bar" + L.id).style.width = "100%";
-      document.getElementById("cnt" + L.id).textContent = N + " / " + N + " токенов"; document.getElementById("time" + L.id).textContent = fmt(N / L.rate) + " с"; }
+      document.getElementById("cnt" + L.id).textContent = N + " / " + N + " tokens"; document.getElementById("time" + L.id).textContent = fmt(N / L.rate) + " s"; }
   } else setTimeout(start, 700);
 })();
 
@@ -472,24 +471,24 @@ function niceTicks(max) {
 function draw() {
   const ours = css("--ours"), theirs = css("--theirs"), grey = css("--ink-3");
   hbars(document.getElementById("chMem"), [
-    { label: "SRAM (внутри чипа)", value: 295.3, color: ours },
-    { label: "PSRAM 120 МГц*", value: 121.8, color: ours, note: "экспериментальный режим" },
-    { label: "PSRAM 80 МГц", value: 86.7, color: ours },
-    { label: "Flash 120 МГц*", value: 46.5, color: grey },
-    { label: "Flash 80 МГц", value: 32.0, color: grey },
-  ], { unit: "МБ/с", dec: 1 });
+    { label: "SRAM (on chip)", value: 295.3, color: ours },
+    { label: "PSRAM 120 MHz*", value: 121.8, color: ours, note: "experimental mode" },
+    { label: "PSRAM 80 MHz", value: 86.7, color: ours },
+    { label: "Flash 120 MHz*", value: 46.5, color: grey },
+    { label: "Flash 80 MHz", value: 32.0, color: grey },
+  ], { unit: "MB/s", dec: 1 });
   hbars(document.getElementById("chPie"), [
-    { label: "Обычный код на C", value: 10.08, color: grey },
-    { label: "Ядро PIE (наше)", value: 0.469, color: ours, note: "в 21,5 раза меньше" },
-  ], { unit: "такта", dec: 2, rowH: 52 });
+    { label: "Plain C code", value: 10.08, color: grey },
+    { label: "PIE kernel (ours)", value: 0.469, color: ours, note: "21.5x fewer" },
+  ], { unit: "cycles", dec: 2, rowH: 52 });
 
   /* H2 dot plot */
   (function h2() {
     const rows = [
-      { label: "урезанная (FFN 320)", v: [2.0059, 2.0116], c: grey },
-      { label: "обычная", v: [2.0000, 2.0002], c: grey },
-      { label: "эксперты MoE ×4", v: [1.9905, 1.9912], c: css("--s3") },
-      { label: "справочник PLE", v: [1.9607, 1.9783], c: ours },
+      { label: "trimmed (FFN 320)", v: [2.0059, 2.0116], c: grey },
+      { label: "dense", v: [2.0000, 2.0002], c: grey },
+      { label: "MoE, 4 experts", v: [1.9905, 1.9912], c: css("--s3") },
+      { label: "PLE", v: [1.9607, 1.9783], c: ours },
     ];
     const w = 720, labelW = 190, x0 = labelW, x1 = w - 40, rowH = 38, H = rows.length * rowH + 34;
     const lo = 1.95, hi = 2.02, sx = (v) => x0 + (v - lo) / (hi - lo) * (x1 - x0);
@@ -501,7 +500,7 @@ function draw() {
       const y = 22 + i * rowH;
       b += `<text x="${x0 - 12}" y="${y + 4}" text-anchor="end" style="fill:var(--ink)">${esc(r.label)}</text>`;
       b += `<line x1="${sx(r.v[0])}" y1="${y}" x2="${sx(r.v[1])}" y2="${y}" style="stroke:${r.c};stroke-width:2"/>`;
-      r.v.forEach((v, k) => { b += `<circle data-tip="${esc(r.label)}, запуск ${k + 1}: ${fmt(v, 4)}" cx="${sx(v)}" cy="${y}" r="7" style="fill:${r.c};stroke:var(--card);stroke-width:2"/>`; });
+      r.v.forEach((v, k) => { b += `<circle data-tip="${esc(r.label)}, run ${k + 1}: ${fmt(v, 4)}" cx="${sx(v)}" cy="${y}" r="7" style="fill:${r.c};stroke:var(--card);stroke-width:2"/>`; });
       const m = (r.v[0] + r.v[1]) / 2;
       b += `<text class="val" x="${sx(Math.max(...r.v)) + 12}" y="${y + 4}">${fmt(m, 3)}</text>`;
     });
@@ -510,12 +509,12 @@ function draw() {
 
   /* stage stacked bars */
   (function stages() {
-    const names = ["вход", "внимание", "блок знаний", "справочник PLE", "выбор слова"];
+    const names = ["input", "attention", "FFN", "PLE", "output layer"];
     const cols = ["--s5", "--s3", "--s4", "--s2", "--s1"].map(css);
     const rows = [
       { label: "esp32-ai", v: [2.1, 20.5, 6.4, 6.3, 58.8] },
-      { label: "наш, полный выбор", v: [0.71, 4.21, 1.46, 1.36, 17.26] },
-      { label: "наш, двухступенчатый", v: [0.71, 4.21, 1.46, 1.36, 3.77] },
+      { label: "ours, full output", v: [0.71, 4.21, 1.46, 1.36, 17.26] },
+      { label: "ours, two-stage", v: [0.71, 4.21, 1.46, 1.36, 3.77] },
     ];
     document.getElementById("lgStage").innerHTML = names.map((n, i) => `<span><i style="background:${cols[i]}"></i>${n}</span>`).join("");
     const w = 720, labelW = 170, x0 = labelW, x1 = w - 80, rowH = 46, H = rows.length * rowH + 30, max = 100;
@@ -528,27 +527,27 @@ function draw() {
       b += `<text x="${x0 - 10}" y="${y + bh / 2 + 4}" text-anchor="end" style="fill:var(--ink)">${esc(r.label)}</text>`;
       r.v.forEach((v, k) => {
         const xa = sx(acc), xb = sx(acc + v);
-        b += `<rect data-tip="${esc(r.label)} · ${names[k]}: ${fmt(v, 2)} мс" x="${xa}" y="${y}" width="${Math.max(0.5, xb - xa - 2)}" height="${bh}" rx="2" style="fill:${cols[k]}"/>`;
+        b += `<rect data-tip="${esc(r.label)} · ${names[k]}: ${fmt(v, 2)} ms" x="${xa}" y="${y}" width="${Math.max(0.5, xb - xa - 2)}" height="${bh}" rx="2" style="fill:${cols[k]}"/>`;
         acc += v;
       });
-      b += `<text class="val" x="${sx(acc) + 8}" y="${y + bh / 2 + 4}">${fmt(acc, 1)} мс</text>`;
+      b += `<text class="val" x="${sx(acc) + 8}" y="${y + bh / 2 + 4}">${fmt(acc, 1)} ms</text>`;
     });
     document.getElementById("chStage").innerHTML = svg(w, H, b);
   })();
 
   hbars(document.getElementById("chProg"), [
-    { label: "v1: движок + PIE + 2 ядра", value: 70.6, color: grey },
-    { label: "v2: выбор слова, SRAM, FFN", value: 97.9, color: ours },
-    { label: "v3: работа на токен", value: 109.5, color: ours },
-    { label: "v3 + PSRAM 120 МГц*", value: 134.2, color: ours, note: "экспериментальный режим" },
-  ], { unit: "ток/с", dec: 1, labelW: 250 });
+    { label: "v1: engine + PIE + 2 cores", value: 70.6, color: grey },
+    { label: "v2: output layer, SRAM, FFN", value: 97.9, color: ours },
+    { label: "v3: per-token work", value: 109.5, color: ours },
+    { label: "v3 + PSRAM 120 MHz*", value: 134.2, color: ours, note: "experimental mode" },
+  ], { unit: "tok/s", dec: 1, labelW: 250 });
 
   hbars(document.getElementById("chVs"), [
-    { label: "esp32-ai (их прошивка)", value: 94.10, color: theirs },
-    { label: "наш, полный выбор", value: 25.00, color: ours, note: "3,8×" },
-    { label: "наш, двухступенчатый", value: 11.52, color: ours, note: "8,2×" },
-    { label: "наш, двухст., 120 МГц*", value: 9.17, color: ours, note: "10,3×" },
-  ], { unit: "мс", dec: 1 });
+    { label: "esp32-ai (their firmware)", value: 94.10, color: theirs },
+    { label: "ours, full output", value: 25.00, color: ours, note: "3.8x" },
+    { label: "ours, two-stage", value: 11.52, color: ours, note: "8.2x" },
+    { label: "ours, two-stage, 120 MHz*", value: 9.17, color: ours, note: "10.3x" },
+  ], { unit: "ms", dec: 1 });
 }
 draw();
 matchMedia("(prefers-color-scheme: dark)").addEventListener("change", draw);

@@ -1,7 +1,7 @@
 # mcu-lm-research
 
 Маленькая языковая модель на ESP32-S3 N16R8: сколько байт весов нужно прочитать на один токен и как сделать их меньше.
-Результаты по этапам: `docs/phase*.md`. Сводный отчёт: `docs/report.html`.
+Результаты по этапам: `docs/phase*.md`. Сводный отчёт: `docs/report.ru.html` (на сайте: https://alikup-ai.github.io/bytes-per-token/report.ru.html), английская версия — `docs/report.html`.
 
 ## Структура
 | папка | что там |

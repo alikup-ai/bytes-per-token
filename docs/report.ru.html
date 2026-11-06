@@ -1,0 +1,556 @@
+<title>LLM на ESP32-S3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --paper: #f5f6f3;
+  --card: #ffffff;
+  --ink: #141c18;
+  --ink-2: #4d5852;
+  --ink-3: #7c8680;
+  --line: #d8ddd8;
+  --grid: #e8ebe7;
+  --ours: #2a78d6;
+  --theirs: #eb6834;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4;
+  --good: #1a7f4b; --bad: #b3261e;
+  --tag-bg: #e3eefb;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #111513; --card: #191e1b; --ink: #edf1ee; --ink-2: #b5beb8; --ink-3: #87918b;
+    --line: #2d3531; --grid: #232926; --ours: #3987e5; --theirs: #d95926;
+    --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181;
+    --good: #4fbf85; --bad: #ef7a72; --tag-bg: #1d2d42;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #111513; --card: #191e1b; --ink: #edf1ee; --ink-2: #b5beb8; --ink-3: #87918b;
+  --line: #2d3531; --grid: #232926; --ours: #3987e5; --theirs: #d95926;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181;
+  --good: #4fbf85; --bad: #ef7a72; --tag-bg: #1d2d42;
+}
+* { box-sizing: border-box; }
+body { background: var(--paper); color: var(--ink); font: 16px/1.6 var(--body); }
+.page { max-width: 1120px; margin: 0 auto; padding-inline: 20px; padding-block: 28px 64px; display: grid; gap: 72px; }
+section { display: grid; gap: 22px; }
+h1, h2, h3 { font-family: var(--display); margin: 0; text-wrap: balance; }
+h1 { font-size: clamp(34px, 6vw, 60px); line-height: 1.02; font-weight: 700; letter-spacing: -.01em; }
+h2 { font-size: clamp(26px, 3.6vw, 36px); line-height: 1.1; font-weight: 600; }
+h3 { font-size: 20px; line-height: 1.2; font-weight: 600; }
+p { margin: 0; max-width: 68ch; }
+.eyebrow { font: 600 12px/1.2 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ours); }
+.lead { font-size: 19px; color: var(--ink-2); max-width: 62ch; }
+.muted { color: var(--ink-2); }
+.small { font-size: 14px; color: var(--ink-2); }
+.mono { font-family: var(--mono); }
+.num { font-variant-numeric: tabular-nums; }
+b.ours { color: var(--ours); } b.theirs { color: var(--theirs); }
+
+/* hero */
+.hero { display: grid; gap: 26px; padding-top: 12px; }
+.hero .sub { font: 500 14px/1.4 var(--mono); color: var(--ink-3); }
+.kpis { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 820px) { .kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.kpi { border-top: 3px solid var(--ink); padding-top: 10px; display: grid; gap: 4px; }
+.kpi b { font: 700 clamp(34px, 5vw, 48px)/1 var(--display); font-variant-numeric: tabular-nums; }
+.kpi b.ours { color: var(--ours); }
+.kpi span { font-size: 14px; color: var(--ink-2); line-height: 1.4; }
+
+/* race */
+.race { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 20px; display: grid; gap: 16px; }
+.race-head { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: baseline; justify-content: space-between; }
+.lanes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 16px; }
+@media (max-width: 760px) { .lanes { grid-template-columns: minmax(0, 1fr); } }
+.lane { display: grid; gap: 10px; grid-template-rows: auto auto 1fr; }
+.lane-title { display: flex; justify-content: space-between; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.lane-title h3 { font-size: 18px; }
+.lane-title .rate { font: 600 14px var(--mono); }
+.lane.ours .rate { color: var(--ours); } .lane.theirs .rate { color: var(--theirs); }
+.bar { height: 6px; background: var(--grid); border-radius: 3px; overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; border-radius: 3px; }
+.lane.ours .bar i { background: var(--ours); } .lane.theirs .bar i { background: var(--theirs); }
+.text { font: 15px/1.6 var(--body); height: 230px; overflow: auto; padding: 12px 14px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); white-space: pre-wrap; overflow-wrap: anywhere; }
+.text .p { color: var(--ink-3); }
+.lane-foot { font: 13px var(--mono); color: var(--ink-2); display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.race-foot { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; }
+button { font: 600 14px/1 var(--body); padding: 11px 16px; border-radius: 8px; border: 1px solid var(--ours); background: var(--ours); color: #fff; cursor: pointer; }
+button:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+/* charts */
+.figure { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px 18px 14px; display: grid; gap: 12px; }
+.figure h3 { font-size: 18px; }
+.figure .cap { font-size: 14px; color: var(--ink-2); }
+.chart { width: 100%; overflow-x: auto; }
+.chart svg { display: block; width: 100%; height: auto; min-width: 520px; }
+.chart text { font-family: var(--mono); font-size: 12px; fill: var(--ink-2); }
+.chart .val { fill: var(--ink); font-weight: 600; }
+.chart .axis { stroke: var(--line); stroke-width: 1; }
+.chart .gl { stroke: var(--grid); stroke-width: 1; }
+.chart [data-tip] { cursor: default; }
+.chart [data-tip]:hover { opacity: .85; }
+.legend { display: flex; flex-wrap: wrap; gap: 8px 16px; font: 13px var(--mono); color: var(--ink-2); }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 6px; vertical-align: -1px; }
+.two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 18px; }
+@media (max-width: 900px) { .two { grid-template-columns: minmax(0, 1fr); } }
+#tip { position: fixed; pointer-events: none; z-index: 10; background: var(--ink); color: var(--paper); font: 12px/1.4 var(--mono); padding: 6px 8px; border-radius: 6px; max-width: 280px; }
+
+/* tables */
+.tbl { overflow-x: auto; border: 1px solid var(--line); border-radius: 12px; background: var(--card); }
+table { border-collapse: collapse; width: 100%; font-size: 14px; }
+th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--grid); vertical-align: top; }
+th { font: 600 11px/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); background: var(--paper); }
+tr:last-child td { border-bottom: 0; }
+td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.yes { color: var(--good); font-weight: 600; } .no { color: var(--ink-3); }
+.hl td { background: var(--tag-bg); }
+.pill { display: inline-block; font: 600 11px/1 var(--mono); padding: 4px 7px; border-radius: 999px; background: var(--tag-bg); color: var(--ours); white-space: nowrap; }
+.pill.neg { background: transparent; border: 1px solid var(--line); color: var(--ink-2); }
+
+/* timeline */
+.steps { list-style: none; padding: 0; margin: 0; display: grid; gap: 0; }
+.steps li { display: grid; grid-template-columns: 120px minmax(0, 1fr); gap: 18px; padding: 16px 0; border-top: 1px solid var(--line); }
+@media (max-width: 640px) { .steps li { grid-template-columns: minmax(0, 1fr); gap: 4px; } }
+.steps .when { font: 600 13px/1.4 var(--mono); color: var(--ours); }
+.steps h3 { font-size: 19px; margin-bottom: 4px; }
+.steps p { color: var(--ink-2); font-size: 15px; }
+
+.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 860px) { .cards { grid-template-columns: minmax(0, 1fr); } }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 8px; align-content: start; }
+.card b.big { font: 700 32px/1 var(--display); color: var(--ours); font-variant-numeric: tabular-nums; }
+.card p { font-size: 15px; color: var(--ink-2); }
+ol.plain { margin: 0; padding-left: 20px; display: grid; gap: 6px; max-width: 72ch; }
+.demo { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr); gap: 20px; align-items: start; }
+@media (max-width: 860px) { .demo { grid-template-columns: minmax(0, 1fr); } }
+pre.code { margin: 0; background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px; font: 13px/1.6 var(--mono); overflow-x: auto; color: var(--ink); }
+footer { font: 13px/1.6 var(--mono); color: var(--ink-3); border-top: 1px solid var(--line); padding-top: 18px; }
+@media (prefers-reduced-motion: reduce) { .bar i { transition: none !important; } }
+</style>
+
+<div class="page">
+
+<header class="hero">
+  <div class="eyebrow">bytes-per-token · сентябрь 2026 · <a href="report.html" style="color:inherit">in English</a></div>
+  <h1>Языковая модель на микроконтроллере за $10 — в 3,8–8,2 раза быстрее открытого аналога</h1>
+  <p class="lead">Мы измерили, где на ESP32-S3 теряется время, и переписали выполнение языковой модели под этот чип. На той же плате и тех же весах наш движок выдаёт тот же текст, что и esp32-ai, в несколько раз быстрее. А собственные модели, устроенные под этот чип, пишут лучше их модели при той же скорости.</p>
+  <div class="kpis">
+    <div class="kpi"><b class="ours num">8,2×</b><span>быстрее esp32-ai: та же модель, та же плата, тот же текст</span></div>
+    <div class="kpi"><b class="num">3,8×</b><span>при полностью одинаковом расчёте (без двухступенчатого выбора слова)</span></div>
+    <div class="kpi"><b class="num">0,63 / 0,86</b><span>бита на байт текста (меньше лучше): наша модель на 8,6 млн параметров против модели esp32-ai на 29 млн; на нашем движке 81 и 94 ток/с в среднем по контексту</span></div>
+    <div class="kpi"><b class="num">0</b><span>расхождений в битах между платой и ПК во всех тестах</span></div>
+  </div>
+  <div class="sub">ESP32-S3-N16R8 · 2 ядра Xtensa LX7 240 МГц · 512 КБ SRAM · 8 МБ PSRAM · 16 МБ Flash</div>
+</header>
+
+<section id="race" aria-label="Гонка">
+  <div class="race">
+    <div class="race-head">
+      <h2>Один и тот же текст, одна и та же плата</h2>
+      <span class="small">Скорости реальные: измерены на плате, промпт «Once upon a time», 200 токенов</span>
+    </div>
+    <div class="lanes">
+      <div class="lane theirs">
+        <div class="lane-title"><h3>esp32-ai (их прошивка)</h3><span class="rate">10,6 ток/с</span></div>
+        <div class="bar"><i id="barT"></i></div>
+        <div class="text" id="txtT"><span class="p">Once upon a time</span></div>
+        <div class="lane-foot"><span id="cntT">0 / 200 токенов</span><span id="timeT">0,0 с</span></div>
+      </div>
+      <div class="lane ours">
+        <div class="lane-title"><h3>Наш движок, та же модель</h3><span class="rate">86,8 ток/с</span></div>
+        <div class="bar"><i id="barO"></i></div>
+        <div class="text" id="txtO"><span class="p">Once upon a time</span></div>
+        <div class="lane-foot"><span id="cntO">0 / 200 токенов</span><span id="timeO">0,0 с</span></div>
+      </div>
+    </div>
+    <div class="race-foot">
+      <p class="small">Тексты совпадают до символа: 759 из 759. Разница только во времени: <b class="theirs">18,8 с</b> против <b class="ours">2,3 с</b>.</p>
+      <button id="replay" type="button">Запустить заново</button>
+    </div>
+  </div>
+</section>
+
+<section id="why">
+  <div class="eyebrow">Главное наблюдение</div>
+  <h2>Скорость упирается в память, а не в вычисления</h2>
+  <p class="lead">Чтобы написать одно слово, модель должна прочитать все свои веса. У чипа три вида памяти с разницей в скорости почти в 10 раз, а векторный блок PIE считает в 21 раз быстрее обычного кода. После его включения процессор в основном ждёт данные.</p>
+  <div class="two">
+    <div class="figure">
+      <h3>Скорость чтения памяти</h3>
+      <div class="cap">МБ/с, измерено на нашей плате (последовательное чтение, 1 ядро)</div>
+      <div class="chart" id="chMem"></div>
+    </div>
+    <div class="figure">
+      <h3>Такты на одно умножение-сложение (int4)</h3>
+      <div class="cap">Меньше лучше. Веса в SRAM, ядро на C против ядра на ассемблере PIE</div>
+      <div class="chart" id="chPie"></div>
+    </div>
+  </div>
+  <p>Отсюда правило, которое определило всю работу: <b>ускорение = меньше байт на каждое слово</b>. Байты на слово = бит на вес × доля читаемых весов ÷ слов за одно чтение. Каждый приём ниже уменьшает один из этих множителей.</p>
+</section>
+
+<section id="path">
+  <div class="eyebrow">Путь</div>
+  <h2>Что мы сделали, по порядку</h2>
+  <ol class="steps">
+    <li><div class="when">Этап 0</div><div><h3>Калькулятор скорости чипа</h3><p>Модель затрат по операциям: чтение каждой памяти плюс вычисления. На чужих замерах, которых модель не видела при подгонке, ошибка 3–5% (всего две проверочные точки); на нашем движке она занижает время на 10–14%. Он позволил отбрасывать идеи на бумаге до написания кода.</p></div></li>
+    <li><div class="when">Этап 1</div><div><h3>Замеры платы</h3><p>Собственная прошивка-бенчмарк: скорость SRAM, PSRAM и Flash, ядра PIE, DMA. Выводы: PIE в 21 раз быстрее простого C (в ~13 раз быстрее ядра esp32-ai); после него узкое место — PSRAM (83 МБ/с на двух ядрах); шина PSRAM даёт ~90 МБ/с на всех, поэтому DMA не добавляет пропускной способности.</p></div></li>
+    <li><div class="when">Этап 2</div><div><h3>Эксперименты с устройством модели</h3><p>27 моделей на ноутбуке, каждый сравниваемый вариант в двух запусках (кроме одного повторного 2-битного). Справочник PLE делает модель умнее при том же объёме чтения; ReLU позволяет пропускать 79% нейронов без потерь; обучение под 4 бита почти бесплатно; 4–6 слоёв лучше 12.</p></div></li>
+    <li><div class="when">Этап 3</div><div><h3>Движок на плате</h3><p>C-код, общий для ПК и платы, плюс ассемблерные ядра PIE. Три версии: 70 → 98 → 110 токенов/с на нашей модели. Каждое изменение измерено отдельно; неудачные откатаны и записаны.</p></div></li>
+    <li><div class="when">Сравнение</div><div><h3>Модель esp32-ai на нашем движке</h3><p>Их опубликованные веса без переквантования. Их прошивка и наш движок на одной плате, на их же тесте: 94,1 против 11,5 мс на токен, текст совпадает полностью.</p></div></li>
+    <li><div class="when">Этап 4</div><div><h3>Несколько слов за одно чтение</h3><p>Угадывание следующих слов на этом чипе не окупается (отрицательный результат). Пакетная обработка заранее известных слов (промпт, однозначные куски JSON) даёт ×1,5–2,8.</p></div></li>
+    <li><div class="when">Этап 5</div><div><h3>Своя модель по рецепту</h3><p>Модель затрат, откалиброванная на плате, предсказала скорость вариантов с точностью 1–5%. Лучший вариант (словарь 8192, справочник вдвое шире, 8,6 млн параметров) после обучения на 70 млн токенов даёт 0,63 бита на байт против 0,86 у модели esp32-ai на 29 млн; наша модель на 3,4 млн лучше её при почти той же скорости.</p></div></li>
+  </ol>
+</section>
+
+<section id="models">
+  <div class="eyebrow">Модели</div>
+  <h2>Как сделать модель умнее, не читая больше</h2>
+  <div class="figure">
+    <h3>Качество при одинаковом объёме чтения на слово (~900 КБ)</h3>
+    <div class="cap">Ошибка на отложенных текстах (val loss), меньше лучше. Две точки на модель — два независимых запуска.</div>
+    <div class="legend"><span><i style="background:var(--ink-3)"></i>обычная и урезанная</span><span><i style="background:var(--s3)"></i>с экспертами (MoE)</span><span><i style="background:var(--ours)"></i>со справочником (PLE)</span></div>
+    <div class="chart" id="chH2"></div>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Приём</th><th>Качество (val loss)</th><th>Скорость (плата или модель затрат)</th><th>Итог</th></tr></thead>
+    <tbody>
+      <tr class="hl"><td>Справочник PLE: таблица на слово во Flash, читается одна строка</td><td class="n">−0,022…−0,039</td><td class="n">+0,5 мс, плата</td><td><span class="pill">работает</span></td></tr>
+      <tr class="hl"><td>ReLU вместо SwiGLU и пропуск молчащих нейронов (79%)</td><td class="n">−0,002</td><td class="n">×1,3, плата</td><td><span class="pill">работает</span></td></tr>
+      <tr class="hl"><td>Обучение сразу под 4 бита (QAT)</td><td class="n">+0,024</td><td class="n">~7× меньше байт, чем fp32 (с масштабами)</td><td><span class="pill">работает</span></td></tr>
+      <tr><td>Эксперты MoE (4 эксперта, читается 1)</td><td class="n">−0,009</td><td class="n">≈, модель затрат</td><td><span class="pill neg">слабо</span></td></tr>
+      <tr><td>2 бита при том же размере (при вдвое большем числе весов и том же объёме чтения: +0,13)</td><td class="n">+0,305</td><td class="n">×1,5, модель затрат (на плате не запускали)</td><td><span class="pill neg">дорого по качеству</span></td></tr>
+      <tr><td>12 слоёв вместо 6</td><td class="n">+0,069</td><td class="n">−15%, модель затрат</td><td><span class="pill neg">хуже по обоим</span></td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">Итоговая модель combo = PLE + ReLU + 4 бита: val loss 2,010 против 2,024 у обычной 4-битной (среднее двух запусков, лучше в обоих), и на 22% быстрее её на плате (98 против 80 ток/с, движок v2).</p>
+
+  <h3>Рецепт против чужой модели: одинаковый текст, одна плата</h3>
+  <p>Модели с разными словарями сравниваются в битах на байт текста: сколько информации модели не хватает, чтобы предсказать каждый байт. Первые 5000 отложенных историй, каждая модель со своим токенизатором и со своими 4-битными весами, как их выполняет движок. Скорость — среднее по всему контексту 256 на нашем движке (двухступенчатый выбор слова, PSRAM 80 МГц).</p>
+  <div class="tbl"><table>
+    <thead><tr><th>Модель</th><th>Параметров</th><th>Бит на байт</th><th>ток/с (среднее, плата)</th></tr></thead>
+    <tbody>
+      <tr><td>esp32-ai TinyStories (их открытая модель)</td><td class="n">28,9 млн</td><td class="n">0,863</td><td class="n">~94</td></tr>
+      <tr class="hl"><td>combo (наша: PLE + ReLU + 4 бита)</td><td class="n">3,4 млн</td><td class="n">0,732</td><td class="n">~91</td></tr>
+      <tr class="hl"><td>справочник PLE вдвое шире</td><td class="n">4,9 млн</td><td class="n">0,716</td><td class="n">~84 (прошлая версия движка)</td></tr>
+      <tr class="hl"><td>словарь 8192 + справочник вдвое шире</td><td class="n">8,6 млн</td><td class="n">0,704</td><td class="n">~81</td></tr>
+      <tr class="hl"><td>то же, обучение на 70 млн токенов вместо 20</td><td class="n">8,6 млн</td><td class="n"><b>0,625</b></td><td class="n">~81</td></tr>
+      <tr><td>словарь 16384 + справочник вдвое шире</td><td class="n">16,0 млн</td><td class="n">0,706</td><td class="n">— (прогноз ~74)</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">Проверка честности: наша оценка их модели (2,45 нат на токен) совпадает с тем, что авторы сами публикуют (перплексия 11,4 до квантования, «~+1» после). У их модели почти все параметры — словарь на 32 тыс. токенов и справочник, а ядро всего 0,56 млн; на детских историях такой словарь почти не используется, а наш вариант со словарём 16384 показал, что справочник насыщается. Их модель мы запускаем только на нашем движке: их прошивка выполняет её со скоростью 10,6 ток/с и наши модели запустить не может.</p>
+</section>
+
+<section id="engine">
+  <div class="eyebrow">Движок</div>
+  <h2>Где время уходит у них и у нас</h2>
+  <div class="figure">
+    <h3>Разбивка времени на один токен, одна и та же модель esp32-ai</h3>
+    <div class="cap">мс на токен по стадиям, их тест (200 токенов). Профиль esp32-ai — их собственный вывод на нашей плате.</div>
+    <div class="legend" id="lgStage"></div>
+    <div class="chart" id="chStage"></div>
+  </div>
+  <div class="cards">
+    <div class="card"><b class="big">4 бита + PIE</b><p>Веса хранятся в 4 битах и распаковываются векторными командами. У esp32-ai 8 бит и обычный C: вдвое больше байт и в ~13 раз больше тактов на операцию (6,2 против 0,47).</p></div>
+    <div class="card"><b class="big">15% строк</b><p>Двухступенчатый выбор слова: 256 групп слов, сначала оценка групп, потом полный расчёт только лучших. Совпадает с полным выбором в 99,4–99,8% позиций; прочитанные строки побитово равны полному расчёту.</p></div>
+    <div class="card"><b class="big">2 ядра</b><p>Каждое умножение делится пополам между ядрами, второе ядро ждёт работу в активном цикле: передача задачи стоит 83–93 такта.</p></div>
+    <div class="card"><b class="big">SRAM</b><p>Сначала буферы движка, затем самые читаемые веса в быструю внутреннюю память (~210 КБ), остальное в PSRAM, таблица PLE остаётся во Flash.</p></div>
+    <div class="card"><b class="big">48% FFN</b><p>ReLU «сначала ворота»: считаем ворота, а две другие матрицы читаем только для живых нейронов. Новое ядро на аккумуляторе QACC для транспонированной матрицы.</p></div>
+    <div class="card"><b class="big">−1 мс</b><p>Работа вне умножений: квантование, GELU по таблице, выбор групп. По профилю, а не наугад, сжали её с 2,2 до 1,2 мс на токен.</p></div>
+  </div>
+  <div class="figure">
+    <h3>Рост скорости движка на нашей модели combo</h3>
+    <div class="cap">Токенов в секунду, 2 ядра, генерация после короткого промпта</div>
+    <div class="chart" id="chProg"></div>
+  </div>
+</section>
+
+<section id="versus">
+  <div class="eyebrow">Честное сравнение</div>
+  <h2>Одна плата, одна модель, один тест</h2>
+  <p>Прошивку esp32-ai мы собрали их способом (arduino-cli, -O3, их раздел Flash) и измерили на нашей плате. Отпечаток модели a9bdd778 совпал с их метаданными, три прогона дали одно и то же значение. Их собственная опубликованная цифра — 94,9 мс, наш замер — 94,1 мс.</p>
+  <div class="figure">
+    <h3>мс на токен, модель esp32-ai (29 млн параметров), позиции 4–203</h3>
+    <div class="cap">Меньше лучше</div>
+    <div class="chart" id="chVs"></div>
+  </div>
+  <div class="tbl"><table>
+    <thead><tr><th>Движок</th><th>Выбор слова</th><th>PSRAM</th><th>мс/токен</th><th>ток/с</th><th>Ускорение</th></tr></thead>
+    <tbody>
+      <tr><td>esp32-ai</td><td>полный, 8 бит</td><td class="n">80 МГц</td><td class="n">94,10</td><td class="n">10,6</td><td class="n">1×</td></tr>
+      <tr class="hl"><td>наш</td><td>полный, 4 бита</td><td class="n">80 МГц</td><td class="n">25,00</td><td class="n">40,0</td><td class="n">3,8×</td></tr>
+      <tr class="hl"><td>наш</td><td>двухступенчатый</td><td class="n">80 МГц</td><td class="n">11,52</td><td class="n">86,8</td><td class="n">8,2×</td></tr>
+      <tr><td>наш</td><td>полный</td><td class="n">120 МГц*</td><td class="n">18,90</td><td class="n">52,9</td><td class="n">5,0×</td></tr>
+      <tr><td>наш</td><td>двухступенчатый</td><td class="n">120 МГц*</td><td class="n">9,17</td><td class="n">109,0</td><td class="n">10,3×</td></tr>
+    </tbody>
+  </table></div>
+  <p class="small">* PSRAM на 120 МГц в ESP-IDF помечена как экспериментальная: «работает при стабильной температуре». Замер при комнатной температуре, сбоев не было.</p>
+</section>
+
+<section id="negative">
+  <div class="eyebrow">Что не сработало</div>
+  <h2>Отрицательные результаты тоже измерены</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Идея</th><th>Ожидание</th><th>Замер</th><th>Почему</th></tr></thead>
+    <tbody>
+      <tr><td>Угадывать 2–4 следующих слова и проверять за одно чтение</td><td class="n">×1,3 по калькулятору</td><td class="n">×0,8–1,05</td><td>после оптимизаций треть времени — вычисления на каждое слово; угадчик даёт лишь 1,4–1,6 слова за проход</td></tr>
+      <tr><td>DMA подгружает веса, пока ядро считает</td><td class="n">−30%</td><td class="n">не быстрее</td><td>шина PSRAM даёт ~90 МБ/с на всех; DMA (77 МБ/с) только делит её с ядрами, а два ядра сами читают 83</td></tr>
+      <tr><td>Масштабы весов в 16 битах вместо 32</td><td class="n">−6% байт</td><td class="n">+5% времени</td><td>перевод 8192 чисел за слово дороже сэкономленного чтения</td></tr>
+      <tr><td>Держать последние значения внимания в SRAM</td><td class="n">−1 мс</td><td class="n">−0,06 мс внимание</td><td>тормозили не записи, а задержки чтения PSRAM (всего вышло −0,39 мс, остаток не объяснён)</td></tr>
+      <tr><td>Веса из генератора «зёрен» (SeedLM), сжатие весов</td><td class="n">выигрыш на GPU</td><td class="n">проигрыш на бумаге</td><td>на чипе нет лишних тактов: распаковка дороже чтения</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section id="novelty">
+  <div class="eyebrow">Новизна</div>
+  <h2>Чем проект отличается от существующих</h2>
+  <div class="tbl"><table>
+    <thead><tr><th>Проект</th><th>Где работает модель</th><th>Скорость на ESP32-S3</th><th>Что есть</th><th>Чего нет</th></tr></thead>
+    <tbody>
+      <tr class="hl"><td><b>Этот проект</b></td><td>ESP32-S3, полностью автономно</td><td class="n">87–110 ток/с (29 млн), 110–134 (2 млн); в конце контекста ~72</td><td>PIE-ядра, 2 ядра, двухступенчатый выбор слова, разреженный FFN, пакеты, модель затрат, побитовая проверка</td><td>прикладная модель (пока детские рассказы)</td></tr>
+      <tr><td>slvDev/esp32-ai</td><td>ESP32-S3</td><td class="n">10,6 ток/с (измерено нами)</td><td>модели TinyStories и Barista, PLE</td><td>PIE, 4-битное выполнение, пропуск работы</td></tr>
+      <tr><td>esp32-tinyLLM (Rust)</td><td>ESP32-S3</td><td class="n">~10,5 ток/с (их данные)</td><td>методика бит-в-бит проверок</td><td>векторный блок, большие выигрыши по байтам</td></tr>
+      <tr><td>Порты Needle (вызов команд)</td><td>ESP32-S3</td><td class="n">~1,5 ток/с (их данные)</td><td>вызов инструментов по схеме</td><td>скорость</td></tr>
+      <tr><td>Deeploy (компилятор)</td><td>RISC-V MCU с NPU</td><td class="n">—</td><td>тайлинг, DMA, малые LLM</td><td>ESP32 / Xtensa PIE</td></tr>
+    </tbody>
+  </table></div>
+  <div class="cards">
+    <div class="card"><h3>1. Самый быстрый известный нам запуск LLM на ESP32-S3</h3><p>На тех же весах и с тем же текстом: 3,8× при одинаковом расчёте и 8,2× с двухступенчатым выбором слова. Других открытых движков с PIE для LLM мы не нашли.</p></div>
+    <div class="card"><h3>2. Модели, устроенные под чип</h3><p>Сравнение устройств моделей при одинаковом объёме чтения на токен и проверка на плате. Наша модель на 3,4 млн параметров пишет лучше открытой модели esp32-ai на 29 млн при почти той же скорости на нашем движке (0,73 против 0,86 бита на байт), а лучшая – 0,63.</p></div>
+    <div class="card"><h3>3. Приёмы серверного мира, проверенные на MCU</h3><p>Двухступенчатый выбор слова, пропуск неактивных нейронов и пакетная обработка известных токенов на микроконтроллере в найденных источниках не встречались. Мы показали, какие из них работают, а какие вредят, и почему.</p></div>
+    <div class="card"><h3>4. Методика, которой можно доверять</h3><p>Модель затрат с проверкой на чужих данных, побитовое совпадение ПК и платы, проверка каждого ядра против эталона на C, повтор каждого эксперимента.</p></div>
+  </div>
+  <p class="small">«Не нашли» означает поиск по GitHub, Hugging Face, arXiv и патентам; это не доказательство отсутствия.</p>
+</section>
+
+<section id="verify">
+  <div class="eyebrow">Проверка</div>
+  <h2>Почему цифрам можно верить</h2>
+  <div class="cards">
+    <div class="card"><b class="big">бит в бит</b><p>ПК, плата с PIE на двух ядрах, на одном ядре и на обычном C дают одинаковые отпечатки всех токенов и всех логитов в каждом прогоне.</p></div>
+    <div class="card"><b class="big">±0,003</b><p>Ошибка модели на отложенном тексте в движке отличается от PyTorch не больше чем на 0,003. Выбор слова совпадает в 98–99% позиций; расхождения только на почти равных вариантах.</p></div>
+    <div class="card"><b class="big">&lt;0,1%</b><p>Разброс между повторами одного и того же прогона. Это не погрешность по разным текстам: от начала к концу контекста скорость падает в 1,6 раза. Все замеры сохранены в логах в репозитории.</p></div>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="eyebrow">Живое демо</div>
+  <h2>Попробуйте сами</h2>
+  <div class="demo">
+    <div style="display:grid; gap:14px">
+      <p>Плата с моделью esp32-ai и нашим движком подключается к любому компьютеру по USB. Страница в Chrome или Edge подключается к плате напрямую, без установки программ. Вы пишете начало истории, плата дописывает её в реальном времени, на экране видна скорость каждого токена.</p>
+      <ol class="plain">
+        <li>Подключите плату кабелем к разъёму COM.</li>
+        <li>Откройте <span class="mono">engine/demo/index.html</span> в Chrome или Edge.</li>
+        <li>«Подключить плату» → выберите порт CH343.</li>
+        <li>Введите начало истории по-английски → «Написать».</li>
+      </ol>
+      <p class="small">Все модели учились на детских рассказах. Для историй лучше всего наша модель со словарём 8192 (varC); модель esp32-ai тоже поддерживается; дообученная combo_qa ещё отвечает на простые вопросы по сказке (режим «Вопрос по сказке», docs/qa-finetune.md). Модель меняется прошивкой одного файла: engine/demo/flash_demo.sh.</p>
+    </div>
+    <pre class="code">ПК  → G 120 700 40 &lt;seed&gt; 0 7 433 447 259 405 …
+плата → P 29.6
+плата → T 11 10320
+плата → T 612 10288
+…
+плата → E 120 10.32</pre>
+  </div>
+</section>
+
+<section id="next">
+  <h2>Ограничения</h2>
+  <p class="small">Модели маленькие (3–29 млн параметров) и обучены на детских рассказах, 20 млн токенов на модель, один LR для всех; сравнение качества с esp32-ai — на тексте нашего распределения (их оценка при этом совпала с их собственной); скорость зависит от длины контекста («110 ток/с» — позиции 13–60; сравнение с esp32-ai — на их тесте, позиции 4–203); режим PSRAM 120 МГц экспериментальный; энергия на токен не измерялась, второе ядро занято активным ожиданием; версия ядра Arduino при замере esp32-ai — 3.3.3 (у авторов 3.3.10).</p>
+</section>
+
+<footer>bytes-per-token · репозиторий: docs/ (этапы 0–4), engine/ (движок и демо), bench/ (замеры) · все цифры измерены на ESP32-S3-N16R8</footer>
+</div>
+<div id="tip" hidden></div>
+
+<script>
+const RACE = {"prompt": "Once upon a time", "tokens": [",", " there", " was", " a", " little", " girl", " named", " Lily", ".", " She", " loved", " to", " play", " outside", " in", " the", " sunshine", ".", " One", " day", ",", " she", " saw", " a", " big", " tree", " with", " a", " hole", " in", " it", ".", " She", " wanted", " to", " touch", " it", ",", " but", " she", " was", " too", " small", ".", "\n", "Lily", "'s", " mom", " came", " to", " help", " her", ".", " She", " said", ",", " \"", "Don", "'t", " worry", ",", " Lily", ".", " I", " will", " help", " you", ".\"", " Lily", " was", " happy", " and", " said", ",", " \"", "Thank", " you", ",", " mom", ".", " I", " will", " help", " you", ".\"", "\n", "They", " went", " to", " the", " tree", " and", " saw", " the", " hole", ".", " Lily", " was", " happy", " and", " said", ",", " \"", "Thank", " you", ",", " mom", ".", " I", " love", " you", ".\"", " Her", " mom", " smiled", " and", " said", ",", " \"", "You", "'re", " welcome", ",", " Lily", ".", " You", " are", " a", " good", " friend", ".\"", "\n", "", "\n", "Once", " upon", " a", " time", ",", " there", " was", " a", " little", " girl", " named", " Lily", ".", " She", " loved", " to", " play", " outside", " in", " the", " park", ".", " One", " day", ",", " she", " saw", " a", " big", " tree", " with", " a", " tree", ".", " She", " wanted", " to", " climb", " the", " tree", " and", " see", " what", " was", " on", " the", " tree", ".", "\n", "Lily", " went", " to", " the", " tree", " and", " saw", " a", " big", " tree", ".", " She", " wanted", " to", " climb", " the", " tree"]};
+const css = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const fmt = (x, d = 1) => x.toLocaleString("ru-RU", { minimumFractionDigits: d, maximumFractionDigits: d });
+
+/* ---------- race ---------- */
+(function race() {
+  const lanes = [
+    { id: "T", rate: 10.63, i: 0 },
+    { id: "O", rate: 86.8, i: 0 },
+  ];
+  const N = RACE.tokens.length;
+  let t0 = 0, raf = 0;
+  function reset() {
+    for (const L of lanes) {
+      L.i = 0;
+      const box = document.getElementById("txt" + L.id);
+      box.innerHTML = '<span class="p">' + RACE.prompt + '</span>';
+      L.span = document.createElement("span");
+      box.appendChild(L.span);
+      document.getElementById("bar" + L.id).style.width = "0%";
+      document.getElementById("cnt" + L.id).textContent = "0 / " + N + " токенов";
+      document.getElementById("time" + L.id).textContent = "0,0 с";
+    }
+  }
+  function frame(now) {
+    const el = (now - t0) / 1000;
+    let busy = false;
+    for (const L of lanes) {
+      const target = Math.min(N, Math.floor(el * L.rate));
+      if (target > L.i) {
+        L.span.textContent += RACE.tokens.slice(L.i, target).join("");
+        L.i = target;
+        const box = document.getElementById("txt" + L.id);
+        box.scrollTop = box.scrollHeight;
+        document.getElementById("bar" + L.id).style.width = (100 * L.i / N) + "%";
+        document.getElementById("cnt" + L.id).textContent = L.i + " / " + N + " токенов";
+      }
+      if (L.i < N) { busy = true; document.getElementById("time" + L.id).textContent = fmt(el) + " с"; }
+      else if (!L.done) { L.done = true; document.getElementById("time" + L.id).textContent = fmt(N / L.rate) + " с"; }
+    }
+    if (busy) raf = requestAnimationFrame(frame);
+  }
+  function start() {
+    cancelAnimationFrame(raf); reset();
+    for (const L of lanes) L.done = false;
+    t0 = performance.now(); raf = requestAnimationFrame(frame);
+  }
+  document.getElementById("replay").addEventListener("click", start);
+  reset();
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    for (const L of lanes) { L.span.textContent = RACE.tokens.join(""); document.getElementById("bar" + L.id).style.width = "100%";
+      document.getElementById("cnt" + L.id).textContent = N + " / " + N + " токенов"; document.getElementById("time" + L.id).textContent = fmt(N / L.rate) + " с"; }
+  } else setTimeout(start, 700);
+})();
+
+/* ---------- tooltip ---------- */
+const tip = document.getElementById("tip");
+document.addEventListener("pointermove", (e) => {
+  const t = e.target.closest && e.target.closest("[data-tip]");
+  if (!t) { tip.hidden = true; return; }
+  tip.textContent = t.getAttribute("data-tip");
+  tip.hidden = false;
+  const x = Math.min(e.clientX + 14, innerWidth - tip.offsetWidth - 8);
+  tip.style.left = x + "px"; tip.style.top = (e.clientY + 14) + "px";
+});
+
+/* ---------- chart helpers (SVG, one scale per chart) ---------- */
+function svg(w, h, body) { return `<svg viewBox="0 0 ${w} ${h}" role="img">${body}</svg>`; }
+function esc(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;"); }
+
+// Horizontal bars: rows [{label, value, color, note}], unit, max
+function hbars(el, rows, { unit = "", max, w = 720, rowH = 40, labelW = 230, dec = 1 } = {}) {
+  const x0 = labelW, x1 = w - 90, H = rows.length * rowH + 30;
+  max = max || Math.max(...rows.map((r) => r.value));
+  const sx = (v) => x0 + (v / max) * (x1 - x0);
+  let b = "";
+  const ticks = niceTicks(max);
+  for (const t of ticks) {
+    b += `<line class="gl" x1="${sx(t)}" y1="6" x2="${sx(t)}" y2="${H - 22}"/>`;
+    b += `<text x="${sx(t)}" y="${H - 6}" text-anchor="middle">${fmt(t, 0)}</text>`;
+  }
+  rows.forEach((r, i) => {
+    const y = 8 + i * rowH, bh = rowH - 16, xw = Math.max(2, sx(r.value) - x0);
+    b += `<text x="${x0 - 10}" y="${y + bh / 2 + 4}" text-anchor="end" style="fill:var(--ink)">${esc(r.label)}</text>`;
+    b += `<path data-tip="${esc(r.label + ": " + fmt(r.value, dec) + " " + unit + (r.note ? " · " + r.note : ""))}" d="M${x0} ${y}h${xw - 4}a4 4 0 0 1 4 4v${bh - 8}a4 4 0 0 1-4 4h-${xw - 4}z" style="fill:${r.color}"/>`;
+    b += `<text class="val" x="${sx(r.value) + 8}" y="${y + bh / 2 + 4}">${fmt(r.value, dec)}${unit ? " " + unit : ""}</text>`;
+  });
+  b += `<line class="axis" x1="${x0}" y1="4" x2="${x0}" y2="${H - 22}"/>`;
+  el.innerHTML = svg(w, H, b);
+}
+function niceTicks(max) {
+  const raw = max / 4, p = Math.pow(10, Math.floor(Math.log10(raw))), m = raw / p;
+  const step = (m < 1.5 ? 1 : m < 3 ? 2 : m < 7 ? 5 : 10) * p;
+  const out = []; for (let v = 0; v <= max + 1e-9; v += step) out.push(v); return out;
+}
+
+function draw() {
+  const ours = css("--ours"), theirs = css("--theirs"), grey = css("--ink-3");
+  hbars(document.getElementById("chMem"), [
+    { label: "SRAM (внутри чипа)", value: 295.3, color: ours },
+    { label: "PSRAM 120 МГц*", value: 121.8, color: ours, note: "экспериментальный режим" },
+    { label: "PSRAM 80 МГц", value: 86.7, color: ours },
+    { label: "Flash 120 МГц*", value: 46.5, color: grey },
+    { label: "Flash 80 МГц", value: 32.0, color: grey },
+  ], { unit: "МБ/с", dec: 1 });
+  hbars(document.getElementById("chPie"), [
+    { label: "Обычный код на C", value: 10.08, color: grey },
+    { label: "Ядро PIE (наше)", value: 0.469, color: ours, note: "в 21,5 раза меньше" },
+  ], { unit: "такта", dec: 2, rowH: 52 });
+
+  /* H2 dot plot */
+  (function h2() {
+    const rows = [
+      { label: "урезанная (FFN 320)", v: [2.0059, 2.0116], c: grey },
+      { label: "обычная", v: [2.0000, 2.0002], c: grey },
+      { label: "эксперты MoE ×4", v: [1.9905, 1.9912], c: css("--s3") },
+      { label: "справочник PLE", v: [1.9607, 1.9783], c: ours },
+    ];
+    const w = 720, labelW = 190, x0 = labelW, x1 = w - 40, rowH = 38, H = rows.length * rowH + 34;
+    const lo = 1.95, hi = 2.02, sx = (v) => x0 + (v - lo) / (hi - lo) * (x1 - x0);
+    let b = "";
+    for (let t = 1.95; t <= 2.0201; t += 0.01) {
+      b += `<line class="gl" x1="${sx(t)}" y1="6" x2="${sx(t)}" y2="${H - 24}"/><text x="${sx(t)}" y="${H - 8}" text-anchor="middle">${fmt(t, 2)}</text>`;
+    }
+    rows.forEach((r, i) => {
+      const y = 22 + i * rowH;
+      b += `<text x="${x0 - 12}" y="${y + 4}" text-anchor="end" style="fill:var(--ink)">${esc(r.label)}</text>`;
+      b += `<line x1="${sx(r.v[0])}" y1="${y}" x2="${sx(r.v[1])}" y2="${y}" style="stroke:${r.c};stroke-width:2"/>`;
+      r.v.forEach((v, k) => { b += `<circle data-tip="${esc(r.label)}, запуск ${k + 1}: ${fmt(v, 4)}" cx="${sx(v)}" cy="${y}" r="7" style="fill:${r.c};stroke:var(--card);stroke-width:2"/>`; });
+      const m = (r.v[0] + r.v[1]) / 2;
+      b += `<text class="val" x="${sx(Math.max(...r.v)) + 12}" y="${y + 4}">${fmt(m, 3)}</text>`;
+    });
+    document.getElementById("chH2").innerHTML = svg(w, H, b);
+  })();
+
+  /* stage stacked bars */
+  (function stages() {
+    const names = ["вход", "внимание", "блок знаний", "справочник PLE", "выбор слова"];
+    const cols = ["--s5", "--s3", "--s4", "--s2", "--s1"].map(css);
+    const rows = [
+      { label: "esp32-ai", v: [2.1, 20.5, 6.4, 6.3, 58.8] },
+      { label: "наш, полный выбор", v: [0.71, 4.21, 1.46, 1.36, 17.26] },
+      { label: "наш, двухступенчатый", v: [0.71, 4.21, 1.46, 1.36, 3.77] },
+    ];
+    document.getElementById("lgStage").innerHTML = names.map((n, i) => `<span><i style="background:${cols[i]}"></i>${n}</span>`).join("");
+    const w = 720, labelW = 170, x0 = labelW, x1 = w - 80, rowH = 46, H = rows.length * rowH + 30, max = 100;
+    const sx = (v) => x0 + v / max * (x1 - x0);
+    let b = "";
+    for (const t of [0, 25, 50, 75, 100]) b += `<line class="gl" x1="${sx(t)}" y1="6" x2="${sx(t)}" y2="${H - 22}"/><text x="${sx(t)}" y="${H - 6}" text-anchor="middle">${t}</text>`;
+    rows.forEach((r, i) => {
+      const y = 8 + i * rowH, bh = rowH - 18;
+      let acc = 0;
+      b += `<text x="${x0 - 10}" y="${y + bh / 2 + 4}" text-anchor="end" style="fill:var(--ink)">${esc(r.label)}</text>`;
+      r.v.forEach((v, k) => {
+        const xa = sx(acc), xb = sx(acc + v);
+        b += `<rect data-tip="${esc(r.label)} · ${names[k]}: ${fmt(v, 2)} мс" x="${xa}" y="${y}" width="${Math.max(0.5, xb - xa - 2)}" height="${bh}" rx="2" style="fill:${cols[k]}"/>`;
+        acc += v;
+      });
+      b += `<text class="val" x="${sx(acc) + 8}" y="${y + bh / 2 + 4}">${fmt(acc, 1)} мс</text>`;
+    });
+    document.getElementById("chStage").innerHTML = svg(w, H, b);
+  })();
+
+  hbars(document.getElementById("chProg"), [
+    { label: "v1: движок + PIE + 2 ядра", value: 70.6, color: grey },
+    { label: "v2: выбор слова, SRAM, FFN", value: 97.9, color: ours },
+    { label: "v3: работа на токен", value: 109.5, color: ours },
+    { label: "v3 + PSRAM 120 МГц*", value: 134.2, color: ours, note: "экспериментальный режим" },
+  ], { unit: "ток/с", dec: 1, labelW: 250 });
+
+  hbars(document.getElementById("chVs"), [
+    { label: "esp32-ai (их прошивка)", value: 94.10, color: theirs },
+    { label: "наш, полный выбор", value: 25.00, color: ours, note: "3,8×" },
+    { label: "наш, двухступенчатый", value: 11.52, color: ours, note: "8,2×" },
+    { label: "наш, двухст., 120 МГц*", value: 9.17, color: ours, note: "10,3×" },
+  ], { unit: "мс", dec: 1 });
+}
+draw();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", draw);
+new MutationObserver(draw).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+</script>
