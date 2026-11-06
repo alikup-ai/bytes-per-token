@@ -110,7 +110,7 @@ footer { font: 12px/1.5 var(--mono); color: var(--ink-3); }
         <p>The <a href="https://github.com/slvDev/esp32-ai">slvDev/esp32-ai</a> TinyStories model (MIT) on our engine: ~87 tokens/s vs 10.6 on its own firmware.</p>
       </div>
     </div>
-    <p class="note">After flashing, close the flasher window, then press <b>Connect board</b> below.</p>
+    <p class="note">After flashing, close the flasher window and <b>reload this page</b> (F5) so it releases the port, then press <b>Connect board</b> below. If the board is not in the port list, use the USB connector marked COM or UART.</p>
   </section>
 
   <section class="panel" aria-label="Connect">
@@ -206,7 +206,9 @@ $("connect").addEventListener("click", async () => {
     port = null; info = null;
   }
   try {
-    port = await navigator.serial.requestPort();
+    // USB-serial chips found on ESP32-S3 boards; hides Bluetooth and other COM ports from the picker
+    const filters = [0x1a86, 0x303a, 0x10c4, 0x0403].map((usbVendorId) => ({ usbVendorId }));
+    port = await navigator.serial.requestPort({ filters });
     await port.open({ baudRate: 115200, bufferSize: 65536 });
     try { await port.setSignals({ dataTerminalReady: false, requestToSend: false }); } catch (e) {}
     writer = port.writable.getWriter();
@@ -216,7 +218,9 @@ $("connect").addEventListener("click", async () => {
     setTimeout(() => { if (!info) send("I"); }, 2500);
     setTimeout(() => { if (!info) showErr("The board does not answer. Was it flashed with step 1? Try pressing RESET on the board, then Connect again."); }, 6000);
   } catch (e) {
-    showErr("Could not open the port: " + e.message + ". Check the cable and that no other program (or the flasher window) holds the port.");
+    port = null;
+    if (e.name === "NotFoundError") return;     // picker closed without choosing a port
+    showErr("Could not open the port (" + e.message + "). It is probably still held by the flasher: reload this page (F5) and press Connect board again. Also close any serial monitor (Arduino IDE, idf.py monitor, PuTTY).");
   }
 });
 
