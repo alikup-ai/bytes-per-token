@@ -2,6 +2,12 @@
 
 **A language model on an $8 ESP32-S3 at ~87 tokens/s: 8x faster than the reference port, on the same board and the same weights.**
 
+![esp32-ai firmware vs this engine: same board, same weights, same 200 tokens](docs/media/race.gif)
+
+<sub>Both panels replay the same 200 tokens at the speed measured on the board for each firmware
+(94.1 vs 11.5 ms/token, ESP32-S3-N16R8, PSRAM 80 MHz). The text is the actual output; our engine reproduces it
+character for character. Made by <code>docs/media/race_gif.py</code>.</sub>
+
 On a microcontroller, once the multiply is vectorized, generation speed is set by one number:
 how many bytes of weights you read from PSRAM per generated token. This repo measures that on real
 hardware, builds a cost model around it, and cuts the bytes until the chip runs out of tricks.
