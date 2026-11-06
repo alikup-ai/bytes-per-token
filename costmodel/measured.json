@@ -1,0 +1,46 @@
+{
+  "_doc": "Published on-device measurements used to calibrate and validate the cost model. Stage times are ms/token from each firmware's own profile line. Do not edit a row to update it; add a new one.",
+  "runs": [
+    {
+      "id": "esp32ai-tinystories",
+      "engine": "esp32ai-c-int8",
+      "arch": "tinystories",
+      "bus": "psram@80",
+      "prompt_len": 4, "n_generate": 200,
+      "stages_ms": {"input": 2.2, "attn": 20.5, "ffn": 6.4, "ple": 6.4, "head": 59.4},
+      "role": "calibrate",
+      "source": "refs/esp32-ai/firmware/esp32_tinystories/README.md 'Measured'"
+    },
+    {
+      "id": "esp32ai-barista",
+      "engine": "esp32ai-c-int8",
+      "arch": "barista",
+      "bus": "psram@80",
+      "mean_pos": 24,
+      "total_ms": 49.6,
+      "role": "validate",
+      "source": "refs/esp32-ai/firmware/esp32_barista/README.md 'Measured': per forward 49.6 ms. mean_pos is an ASSUMPTION (short questions, ~32 pieces/answer); see validate.py sensitivity sweep"
+    },
+    {
+      "id": "tinyllm-rust",
+      "engine": "tinyllm-rust-int4",
+      "arch": "tinystories",
+      "bus": "psram@80",
+      "prompt_len": 18, "n_generate": 400,
+      "stages_ms": {"input": 4.0, "attn": 27.1, "ffn": 6.5, "ple": 7.9, "head": 49.7},
+      "role": "calibrate",
+      "source": "refs/esp32-tinyLLM/benchmarks/device.toml, shipping Rust row (95.2 ms wall)"
+    },
+    {
+      "id": "tinyllm-rust-fastmspi",
+      "engine": "tinyllm-rust-int4",
+      "arch": "tinystories",
+      "bus": "psram@120",
+      "prompt_len": 18, "n_generate": 400,
+      "stages_ms": {"input": 3.9, "attn": 25.6, "ffn": 6.3, "ple": 7.7, "head": 48.2},
+      "role": "validate",
+      "source": "refs/esp32-tinyLLM/BENCHMARKING.md, 'Rust, --fast-mspi' row. Only PSRAM clock changes (flash part stays at its own clock)",
+      "caveat": "2026-09-29: phase 1 (docs/phase1-bench.md) found that on the S3 the flash shares the MSPI clock and also runs at 120 MHz. If so here, the model (flash cost from the 80 MHz fit) over-prices flash, and the -4.6% agreement is partly errors cancelling"
+    }
+  ]
+}

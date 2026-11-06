@@ -1,0 +1,36 @@
+refs/
+__pycache__/
+*.pyc
+.venv/
+data/
+runs/
+# ESP-IDF builds and generated configs (sdkconfig.defaults and overlays are tracked)
+build/
+build120/
+sdkconfig
+sdkconfig.old
+sdkconfig.120
+set_target.log
+# engine outputs: packs (2-15 MB), downloaded esp32-ai release, logits dumps. Keep the logs
+# (evidence cited in docs/) and the small helper scripts.
+engine/out/*
+!engine/out/*.log
+!engine/out/*.py
+!engine/out/*.sh
+!engine/out/*.c
+# arduino-cli build of the esp32-ai firmware (their code and binaries; rebuilt by the steps in docs/phase3-esp32ai.md)
+bench/esp32ai_fw_build/
+sdkconfig.demo
+sdkconfig.demo120
+# every ESP-IDF build dir (build, build120, builddemo, ...)
+engine/esp32/build*/
+bench/esp32s3_bench/build*/
+
+# local API keys (never commit)
+.openrouter_key
+*.key
+
+
+# local notes with keys, Word lock files
+api.txt
+~$*

@@ -1,0 +1,5 @@
+
+
+
+vocab 8192: stories train 384,146 val 27,631; tokens train 75,717,420 val 5,414,984
+bytes/token (val): 4.16

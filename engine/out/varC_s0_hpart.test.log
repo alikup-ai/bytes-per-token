@@ -1,0 +1,129 @@
+esptool --chip esp32s3 -p COM6 -b 921600 write_flash --flash_mode dio --flash_freq 80m --flash_size 16MB 0x0 bootloader/bootloader.bin 0x10000 mculm_engine.bin 0x8000 partition_table/partition-table.bin
+WARNING: Deprecated: Option '--flash_mode' is deprecated. Use '--flash-mode' instead.
+WARNING: Deprecated: Option '--flash_freq' is deprecated. Use '--flash-freq' instead.
+WARNING: Deprecated: Option '--flash_size' is deprecated. Use '--flash-size' instead.
+WARNING: Deprecated: Command 'write_flash' is deprecated. Use 'write-flash' instead.
+esptool v5.4.0
+Serial port COM6:
+Connecting....
+Connected to ESP32-S3 on COM6:
+Chip type:          ESP32-S3 (QFN56) (revision v0.2)
+Features:           Wi-Fi, BT 5 (LE), Dual Core + LP Core, 240MHz, Embedded PSRAM 8MB (AP_3v3)
+Crystal frequency:  40MHz
+MAC:                1c:db:d4:45:57:b4
+
+Uploading stub flasher...
+Running stub flasher...
+Stub flasher running.
+Changing baud rate to 921600...
+Changed.
+
+Configuring flash size...
+
+Writing 'bootloader/bootloader.bin' at 0x00000000...
+SHA digest in image updated.
+Flash will be erased from 0x00000000 to 0x00005fff...
+Compressed 22272 bytes to 14232...
+Writing at 0x00005700 ============================== 100.0% 13.90kB/13.90kB [0s] 
+Wrote 22272 bytes (14232 compressed) at 0x00000000 in 0.4 seconds (435.4 kbit/s).
+Verifying written data...
+Hash of data verified.
+
+Writing 'mculm_engine.bin' at 0x00010000...
+Flash will be erased from 0x00010000 to 0x0004cfff...
+Compressed 248224 bytes to 144689...
+Writing at 0x0001c70b ===                             11.3% 16.00kB/141.30kB [0s] 
+Writing at 0x00022dd6 ======>                         22.6% 32.00kB/141.30kB [0s] 
+Writing at 0x00028772 ==========                      34.0% 48.00kB/141.30kB [0s] 
+Writing at 0x0002db3c =============>                  45.3% 64.00kB/141.30kB [0s] 
+Writing at 0x000334bd ================>               56.6% 80.00kB/141.30kB [1s] 
+Writing at 0x0003c29b ====================            67.9% 96.00kB/141.30kB [1s] 
+Writing at 0x000418b4 =======================>        79.3% 112.00kB/141.30kB [1s] 
+Writing at 0x0004776c ===========================     90.6% 128.00kB/141.30kB [1s] 
+Writing at 0x0004c9a0 ============================== 100.0% 141.30kB/141.30kB [1s] 
+Wrote 248224 bytes (144689 compressed) at 0x00010000 in 2.1 seconds (933.8 kbit/s).
+Verifying written data...
+Hash of data verified.
+
+Writing 'partition_table/partition-table.bin' at 0x00008000...
+Flash will be erased from 0x00008000 to 0x00008fff...
+Compressed 3072 bytes to 120...
+Writing at 0x00008c00 ============================== 100.0% 120B/120B [0s] 
+Wrote 3072 bytes (120 compressed) at 0x00008000 in 0.0 seconds (522.6 kbit/s).
+Verifying written data...
+Hash of data verified.
+
+Hard resetting via RTS pin...
+1. PC engine vs PyTorch (same int4 weights)
+  [PASS] NLL within 0.02 of PyTorch  engine 1.8348 torch 1.8345 (+0.0004)
+  [PASS] argmax agreement >= 97%  98.83% of 512 positions
+  [PASS] logits close to PyTorch (int8 activations)  |dlogit| median 0.023; top-2 gap error median 0.025, p99 0.131 (logit std 2.63)
+  [PASS] greedy generations match PyTorch up to near ties  identical prefix per prompt: [48, 48, 42, 48, 48] of 48; torch top-2 gap where they split: 0.0221
+2. PC determinism, with the board's head budget
+  [PASS] two-stage head: read rows bit-identical to full head  1250 of 8192 rows read, top-1 same as full head 99.80%
+  [PASS] two-stage head: top-1 agreement >= 98%
+  [PASS] batched = sequential (batch 1..16 give identical logits)  b1 9ad3bf8d, b2 9ad3bf8d, b4 9ad3bf8d, b8 9ad3bf8d, b16 9ad3bf8d
+  [PASS] rewind: stepping back reproduces the logits  positions 60 -> 37, 5 redone
+  [PASS] two PC runs identical
+  [PASS] two-worker split identical
+3-5. board run 1/1
+    ENG {"test":"heapcheck","after":"llm_new","ok":1}
+    ENG {"test":"unit_colsum","cases":40,"bad_lanes":0,"first_bad_lane":-1,"cyc_call13_sram":235,"cyc_call13_unpack":232,"cyc_call13_cold_psram":2501}
+    ENG {"test":"micro","cyc_exp":132.9,"cyc_recip":89.0,"cyc_par2_empty":89.0,"cyc_q4g_4KB_sram":4891.6,"cyc_q4g_4KB_psram_cold":12736.8,"cyc_psram_random_load":16
+    ENG {"test":"heapcheck","after":"microbench","ok":1}
+    ENG {"label":"board","test":"config","vocab":8192,"d":128,"layers":6,"heads":4,"ffn":256,"ple":128,"act":1,"ctx":256,"pack_bytes":5714624,"load_ms":68.6,"weight
+    ENG {"label":"pie2","test":"gen","prompt":0,"ids":[339,502,266,324,329,336,620,267,531,336,620,14,528,327,12,392,505,259,346,614,314,336,705,14,339,283,378,376,
+    ENG {"label":"pie2","test":"gen","prompt":1,"ids":[407,266,324,329,309,14,316,653,266,1892,263,478,329,342,1834,12,409,309,283,423,880,14,199,737,384,387,382,47
+    ENG {"label":"pie2","test":"gen","prompt":2,"ids":[199,383,327,12,259,391,475,402,405,550,266,263,524,14,339,382,263,812,267,407,266,324,14,405,325,12,317,1101,
+    ENG {"label":"pie2","test":"gen","prompt":3,"ids":[346,12,670,478,14,285,464,407,266,324,329,263,478,12,409,309,283,423,897,386,474,266,1468,14,199,411,464,653,
+    ENG {"label":"pie2","test":"gen","prompt":4,"ids":[41,922,779,12,341,14,338,803,489,1142,266,899,349,397,341,533,888,267,325,12,317,41,922,779,12,719,14,338,803
+    ENG {"label":"pie2","test":"rewind","from":60,"to":37,"redone":5,"ok":1}
+    ENG {"label":"pie2","test":"poscurve","bucket":32,"first_pos":13,"ms_per_tok":[9.955,10.402,11.179,11.932,12.798,13.583,14.294,15.070]}
+    ENG {"label":"pie2","test":"speed","rep":0,"tokens":48,"ms_per_tok":10.216,"stage_ms_per_tok":{"input":0.455,"attn_mv":2.457,"attn":1.320,"ffn":2.688,"ple":1.61
+    ENG {"label":"pie2","test":"speed","rep":1,"tokens":48,"ms_per_tok":10.215,"stage_ms_per_tok":{"input":0.455,"attn_mv":2.457,"attn":1.319,"ffn":2.688,"ple":1.61
+    ENG {"label":"pie2","test":"speed","rep":2,"tokens":48,"ms_per_tok":10.215,"stage_ms_per_tok":{"input":0.455,"attn_mv":2.456,"attn":1.320,"ffn":2.688,"ple":1.61
+    ENG {"label":"pie2","test":"speed","rep":3,"tokens":48,"ms_per_tok":10.217,"stage_ms_per_tok":{"input":0.455,"attn_mv":2.457,"attn":1.320,"ffn":2.688,"ple":1.61
+    ENG {"label":"pie2","test":"speed","rep":4,"tokens":48,"ms_per_tok":10.215,"stage_ms_per_tok":{"input":0.455,"attn_mv":2.457,"attn":1.320,"ffn":2.688,"ple":1.61
+    ENG {"label":"pie2","test":"batch","tokens":64,"runs":[{"batch":1,"ms_per_tok":10.088,"last_logits_digest":"9ad3bf8d"},{"batch":2,"ms_per_tok":7.600,"last_logit
+    ENG {"label":"pie2","test":"eval","targets":510,"nll":1.834832,"nll_sum_bits":"4469f0ea","argmax_digest":"8554de30","screen_budget":0.150,"screen_rows":1249.9,"
+    ENG {"label":"pie2full","test":"speed","rep":0,"tokens":48,"ms_per_tok":15.866,"stage_ms_per_tok":{"input":0.454,"attn_mv":2.457,"attn":1.321,"ffn":2.687,"ple":
+    ENG {"label":"pie2full","test":"speed","rep":1,"tokens":48,"ms_per_tok":15.865,"stage_ms_per_tok":{"input":0.454,"attn_mv":2.457,"attn":1.320,"ffn":2.688,"ple":
+    ENG {"label":"pie2full","test":"speed","rep":2,"tokens":48,"ms_per_tok":15.866,"stage_ms_per_tok":{"input":0.454,"attn_mv":2.456,"attn":1.320,"ffn":2.688,"ple":
+    ENG {"label":"pie2warm","test":"speed","rep":0,"tokens":48,"ms_per_tok":10.412,"stage_ms_per_tok":{"input":0.455,"attn_mv":2.457,"attn":0.585,"ffn":2.686,"ple":
+    ENG {"label":"pie2warm","test":"speed","rep":1,"tokens":48,"ms_per_tok":10.412,"stage_ms_per_tok":{"input":0.455,"attn_mv":2.457,"attn":0.585,"ffn":2.686,"ple":
+    ENG {"label":"pie2warm","test":"speed","rep":2,"tokens":48,"ms_per_tok":10.413,"stage_ms_per_tok":{"input":0.455,"attn_mv":2.457,"attn":0.585,"ffn":2.686,"ple":
+    ENG {"label":"pie2warm","test":"eval","targets":510,"nll":1.834832,"nll_sum_bits":"4469f0ea","argmax_digest":"8554de30","screen_budget":0.150,"screen_rows":1249
+    ENG {"label":"pie1","test":"gen","prompt":0,"ids":[339,502,266,324,329,336,620,267,531,336,620,14,528,327,12,392,505,259,346,614,314,336,705,14,339,283,378,376,
+    ENG {"label":"pie1","test":"gen","prompt":1,"ids":[407,266,324,329,309,14,316,653,266,1892,263,478,329,342,1834,12,409,309,283,423,880,14,199,737,384,387,382,47
+    ENG {"label":"pie1","test":"gen","prompt":2,"ids":[199,383,327,12,259,391,475,402,405,550,266,263,524,14,339,382,263,812,267,407,266,324,14,405,325,12,317,1101,
+    ENG {"label":"pie1","test":"gen","prompt":3,"ids":[346,12,670,478,14,285,464,407,266,324,329,263,478,12,409,309,283,423,897,386,474,266,1468,14,199,411,464,653,
+    ENG {"label":"pie1","test":"gen","prompt":4,"ids":[41,922,779,12,341,14,338,803,489,1142,266,899,349,397,341,533,888,267,325,12,317,41,922,779,12,719,14,338,803
+    ENG {"label":"pie1","test":"rewind","from":60,"to":37,"redone":5,"ok":1}
+    ENG {"label":"pie1","test":"speed","rep":0,"tokens":48,"ms_per_tok":13.630,"stage_ms_per_tok":{"input":0.684,"attn_mv":3.302,"attn":1.884,"ffn":3.640,"ple":2.02
+    ENG {"label":"pie1","test":"speed","rep":1,"tokens":48,"ms_per_tok":13.630,"stage_ms_per_tok":{"input":0.684,"attn_mv":3.303,"attn":1.884,"ffn":3.639,"ple":2.02
+    ENG {"label":"pie1","test":"batch","tokens":64,"runs":[{"batch":1,"ms_per_tok":13.453,"last_logits_digest":"9ad3bf8d"},{"batch":2,"ms_per_tok":10.801,"last_logi
+    ENG {"label":"pie1","test":"eval","targets":510,"nll":1.834832,"nll_sum_bits":"4469f0ea","argmax_digest":"8554de30","screen_budget":0.150,"screen_rows":1249.9,"
+    ENG {"label":"ref1","test":"gen","prompt":0,"ids":[339,502,266,324,329,336,620,267,531,336,620,14,528,327,12,392,505,259,346,614,314,336,705,14,339,283,378,376,
+    ENG {"label":"ref1","test":"gen","prompt":1,"ids":[407,266,324,329,309,14,316,653,266,1892,263,478,329,342,1834,12,409,309,283,423,880,14,199,737,384,387,382,47
+    ENG {"label":"ref1","test":"gen","prompt":2,"ids":[199,383,327,12,259,391,475,402,405,550,266,263,524,14,339,382,263,812,267,407,266,324,14,405,325,12,317,1101,
+    ENG {"label":"ref1","test":"gen","prompt":3,"ids":[346,12,670,478,14,285,464,407,266,324,329,263,478,12,409,309,283,423,897,386,474,266,1468,14,199,411,464,653,
+    ENG {"label":"ref1","test":"gen","prompt":4,"ids":[41,922,779,12,341,14,338,803,489,1142,266,899,349,397,341,533,888,267,325,12,317,41,922,779,12,719,14,338,803
+    ENG {"label":"ref1","test":"rewind","from":60,"to":37,"redone":5,"ok":1}
+    ENG {"label":"ref1","test":"batch","tokens":64,"runs":[{"batch":1,"ms_per_tok":76.399,"last_logits_digest":"9ad3bf8d"},{"batch":2,"ms_per_tok":69.300,"last_logi
+    ENG {"label":"ref1","test":"eval","targets":510,"nll":1.834832,"nll_sum_bits":"4469f0ea","argmax_digest":"8554de30","screen_budget":0.150,"screen_rows":1249.9,"
+    ENG {"test":"done"}
+    weights: SRAM 203 KB, PSRAM 1136 KB, flash in place 4160 KB; load 68.6 ms
+  [PASS] run 1: pie2 == pie1 == ref1
+  [PASS] run 1: board == PC (bit-exact)
+  pie2 ms/token by position (32 per bucket, from 13): 9.96, 10.40, 11.18, 11.93, 12.80, 13.58, 14.29, 15.07
+  speed pie2: 10.22 ms/token = 97.9 tok/s (min 10.21, max 10.22, spread 0.0%, n=5)
+  batch (64 known tokens) ms/token: n=1 10.09, n=2 7.60, n=4 6.31, n=8 5.67, n=16 5.35
+  speed pie1: 13.63 ms/token = 73.4 tok/s (min 13.63, max 13.63, spread 0.0%, n=2)
+  batch (64 known tokens) ms/token: n=1 10.09, n=2 7.60, n=4 6.31, n=8 5.67, n=16 5.35
+  speed pie2full: 15.87 ms/token = 63.0 tok/s (min 15.87, max 15.87, spread 0.0%, n=3)
+  batch (64 known tokens) ms/token: n=1 10.09, n=2 7.60, n=4 6.31, n=8 5.67, n=16 5.35
+  speed pie2warm: 10.41 ms/token = 96.0 tok/s (min 10.41, max 10.41, spread 0.0%, n=3)
+  batch (64 known tokens) ms/token: n=1 10.09, n=2 7.60, n=4 6.31, n=8 5.67, n=16 5.35
+  pie2 stages ms/token: input 0.46, attn_mv 2.46, attn 1.32, ffn 2.69, ple 1.61, head 1.68, att_rope_store 0.17, att_scores 0.37, att_softmax 0.24, att_v 0.52
+
+12/12 checks passed

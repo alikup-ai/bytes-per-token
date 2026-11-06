@@ -1,0 +1,183 @@
+{
+  "seq_read": [
+    {
+      "tier": "sram",
+      "cores": 1,
+      "MBps": 295.3
+    },
+    {
+      "tier": "psram",
+      "cores": 1,
+      "MBps": 86.7
+    },
+    {
+      "tier": "psram",
+      "cores": 2,
+      "MBps": 89.8
+    },
+    {
+      "tier": "flash",
+      "cores": 1,
+      "MBps": 32.0
+    },
+    {
+      "tier": "flash",
+      "cores": 2,
+      "MBps": 32.4
+    }
+  ],
+  "flash_row": [
+    {
+      "row_bytes": 64,
+      "us": 3.81
+    },
+    {
+      "row_bytes": 256,
+      "us": 9.66
+    },
+    {
+      "row_bytes": 1024,
+      "us": 33.23
+    }
+  ],
+  "gemv": [
+    {
+      "kernel": "scalar_s8",
+      "tier": "sram",
+      "rows": 1024,
+      "cols": 96,
+      "cyc_per_mac": 8.302,
+      "weight_MBps": 28.9,
+      "match_ref": 1
+    },
+    {
+      "kernel": "pie_s8",
+      "tier": "sram",
+      "rows": 1024,
+      "cols": 96,
+      "cyc_per_mac": 0.386,
+      "weight_MBps": 622.2,
+      "match_ref": 1
+    },
+    {
+      "kernel": "scalar_q4",
+      "tier": "sram",
+      "rows": 2048,
+      "cols": 96,
+      "cyc_per_mac": 10.084,
+      "weight_MBps": 11.9,
+      "match_ref": 1
+    },
+    {
+      "kernel": "pie_q4",
+      "tier": "sram",
+      "rows": 2048,
+      "cols": 96,
+      "cyc_per_mac": 0.469,
+      "weight_MBps": 255.9,
+      "match_ref": 1
+    },
+    {
+      "kernel": "scalar_s8",
+      "tier": "psram",
+      "rows": 16384,
+      "cols": 96,
+      "cyc_per_mac": 9.609,
+      "weight_MBps": 25.0,
+      "match_ref": 1
+    },
+    {
+      "kernel": "pie_s8",
+      "tier": "psram",
+      "rows": 16384,
+      "cols": 96,
+      "cyc_per_mac": 2.982,
+      "weight_MBps": 80.5,
+      "match_ref": 1
+    },
+    {
+      "kernel": "scalar_q4",
+      "tier": "psram",
+      "rows": 16384,
+      "cols": 96,
+      "cyc_per_mac": 10.773,
+      "weight_MBps": 11.1,
+      "match_ref": 1
+    },
+    {
+      "kernel": "pie_q4",
+      "tier": "psram",
+      "rows": 16384,
+      "cols": 96,
+      "cyc_per_mac": 1.642,
+      "weight_MBps": 73.1,
+      "match_ref": 1
+    },
+    {
+      "kernel": "scalar_s8",
+      "tier": "flash",
+      "rows": 16384,
+      "cols": 96,
+      "cyc_per_mac": 10.207,
+      "weight_MBps": 23.5,
+      "match_ref": 1
+    },
+    {
+      "kernel": "pie_s8",
+      "tier": "flash",
+      "rows": 16384,
+      "cols": 96,
+      "cyc_per_mac": 7.718,
+      "weight_MBps": 31.1,
+      "match_ref": 1
+    },
+    {
+      "kernel": "scalar_q4",
+      "tier": "flash",
+      "rows": 16384,
+      "cols": 96,
+      "cyc_per_mac": 11.054,
+      "weight_MBps": 10.9,
+      "match_ref": 1
+    },
+    {
+      "kernel": "pie_q4",
+      "tier": "flash",
+      "rows": 16384,
+      "cols": 96,
+      "cyc_per_mac": 4.01,
+      "weight_MBps": 29.9,
+      "match_ref": 1
+    }
+  ],
+  "gemv_dual": [
+    {
+      "kernel": "pie_s8",
+      "tier": "psram",
+      "weight_MBps": 86.5
+    },
+    {
+      "kernel": "pie_q4",
+      "tier": "psram",
+      "weight_MBps": 83.4
+    }
+  ],
+  "dma_overlap": [
+    {
+      "bytes": 1048576,
+      "dma_alone_MBps": 32.9,
+      "dma_with_compute_MBps": 32.9,
+      "compute_alone_us": 31765,
+      "compute_with_dma_us": 32164
+    }
+  ],
+  "boot": [
+    {
+      "psram_free": 8386156,
+      "sram_free": 333327
+    }
+  ],
+  "done": [
+    {}
+  ]
+}

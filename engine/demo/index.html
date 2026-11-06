@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ESP32-S3 пишет</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root {
+  color-scheme: light;
+  --paper: #f5f6f3;
+  --card: #ffffff;
+  --ink: #141c18;
+  --ink-2: #4d5852;
+  --ink-3: #7c8680;
+  --line: #d8ddd8;
+  --accent: #2a78d6;
+  --accent-ink: #ffffff;
+  --accent-soft: #e3eefb;
+  --good: #1a7f4b;
+  --warn: #a15c00;
+  --bar: #2a78d6;
+  --prompt: #7c8680;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #121614; --card: #1a1f1c; --ink: #edf1ee; --ink-2: #b5beb8; --ink-3: #87918b;
+    --line: #2d3531; --accent: #3987e5; --accent-soft: #1d2d42; --good: #4fbf85; --warn: #e0a24a; --bar: #3987e5; --prompt: #87918b;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #121614; --card: #1a1f1c; --ink: #edf1ee; --ink-2: #b5beb8; --ink-3: #87918b;
+  --line: #2d3531; --accent: #3987e5; --accent-soft: #1d2d42; --good: #4fbf85; --warn: #e0a24a; --bar: #3987e5; --prompt: #87918b;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.55 var(--body); }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 20px; padding-block: 20px 40px; display: grid; gap: 18px; }
+header { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; justify-content: space-between; }
+h1 { font: 600 28px/1.1 var(--display); margin: 0; letter-spacing: .01em; text-wrap: balance; }
+h1 small { display: block; font: 400 14px/1.4 var(--body); color: var(--ink-2); margin-top: 4px; }
+.conn { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.chip { font: 500 12px/1 var(--mono); padding: 7px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-2); background: var(--card); }
+.chip.on { border-color: var(--good); color: var(--good); }
+.chip.on::before { content: "● "; }
+button { font: 600 14px/1 var(--body); border-radius: 8px; padding: 11px 16px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+button:disabled { opacity: .45; cursor: not-allowed; }
+button:focus-visible, textarea:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.grid { display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 14px; }
+label, .lbl { font: 600 11px/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+textarea { width: 100%; min-height: 120px; resize: vertical; font: 16px/1.5 var(--body); color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+.examples { display: flex; flex-wrap: wrap; gap: 6px; }
+.examples button { font: 400 13px/1.2 var(--body); padding: 7px 10px; border-radius: 999px; }
+.row { display: grid; gap: 6px; }
+.row .val { font: 500 13px var(--mono); color: var(--ink-2); }
+.seg { display: flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { flex: 1; border: 0; border-radius: 0; padding: 9px 6px; font-weight: 500; font-size: 13px; }
+.seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+input[type=text] { width: 100%; font: 16px/1.4 var(--body); color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; }
+.qa, .story { display: grid; gap: 14px; }
+.qa[hidden], .story[hidden] { display: none; }
+.out .q { display: block; margin-top: 14px; color: var(--ink-2); font-weight: 500; }
+.out .a { display: block; margin-top: 6px; padding: 10px 14px; border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 8px 8px 0; font-weight: 500; }
+.actions { display: flex; gap: 10px; }
+.actions button { flex: 1; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 560px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.stat { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; gap: 2px; }
+.stat b { font: 600 30px/1.05 var(--display); font-variant-numeric: tabular-nums; }
+.stat span { font: 12px/1.3 var(--body); color: var(--ink-2); }
+.out { min-height: 280px; font: 19px/1.65 var(--body); white-space: pre-wrap; overflow-wrap: anywhere; }
+.out .p { color: var(--prompt); }
+.cursor { display: inline-block; width: .55em; height: 1.05em; vertical-align: -.15em; background: var(--accent); margin-left: 1px; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .cursor { animation: none; } }
+canvas { width: 100%; height: 70px; display: block; }
+.note { font-size: 13px; color: var(--ink-2); line-height: 1.5; }
+.err { color: var(--warn); font-size: 14px; }
+footer { font: 12px/1.5 var(--mono); color: var(--ink-3); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Языковая модель на ESP32-S3
+      <small>Чип за $10, без интернета. Плата сама пишет продолжение вашего текста, по слову, в реальном времени.</small></h1>
+    <div class="conn">
+      <span class="chip" id="status">Плата не подключена</span>
+      <button class="primary" id="connect">Подключить плату</button>
+    </div>
+  </header>
+
+  <p class="err" id="err" hidden></p>
+
+  <div class="grid">
+    <section class="panel" aria-label="Запрос">
+      <div class="seg" id="mode" role="group" aria-label="Режим">
+        <button type="button" data-m="story" aria-pressed="true">Продолжить историю</button>
+        <button type="button" data-m="qa" aria-pressed="false">Вопрос по сказке</button>
+      </div>
+      <div class="qa" hidden>
+        <div class="row">
+          <label for="story">Сказка (по-английски)</label>
+          <textarea id="story" style="min-height:170px"></textarea>
+        </div>
+        <div class="examples" id="stories"></div>
+        <div class="row">
+          <label for="question">Вопрос</label>
+          <input id="question" type="text" autocomplete="off">
+        </div>
+        <div class="examples" id="questions"></div>
+        <div class="actions">
+          <button class="primary" id="ask" disabled>Спросить</button>
+        </div>
+        <p class="note">Модель отвечает на простые вопросы по тексту: как зовут героя, кто он, куда пошёл, что нашёл или увидел, что чувствовал, что сказал. Режим работает с моделью <b>combo_qa</b>. Сказка до ~200 токенов (примерно 150 слов).</p>
+      </div>
+      <div class="story">
+      <div class="row">
+        <label for="prompt">Начало истории (по-английски)</label>
+        <textarea id="prompt">Once upon a time, a little robot</textarea>
+      </div>
+      <div class="examples" id="examples">
+        <button type="button">Once upon a time, a little robot</button>
+        <button type="button">Tom had a big red ball. He</button>
+        <button type="button">One day, Lily and her dog went to the park.</button>
+        <button type="button">The sun was shining and the birds were singing.</button>
+      </div>
+      <div class="row">
+        <div class="lbl">Характер текста</div>
+        <div class="seg" id="temp" role="group" aria-label="Характер текста">
+          <button type="button" data-t="0" aria-pressed="false">Точно</button>
+          <button type="button" data-t="700" aria-pressed="true">Живо</button>
+          <button type="button" data-t="1000" aria-pressed="false">Смело</button>
+        </div>
+      </div>
+      <div class="row">
+        <label for="len">Длина ответа, токенов: <span class="val" id="lenv">120</span></label>
+        <input type="range" id="len" min="20" max="220" step="10" value="120">
+      </div>
+      <div class="actions">
+        <button class="primary" id="go" disabled>Написать</button>
+        <button id="stop" disabled>Стоп</button>
+      </div>
+      <p class="note">Модель училась на детских рассказах: в этом режиме она <b>продолжает</b> историю. Всё считается на плате, компьютер только показывает текст.</p>
+      </div>
+    </section>
+
+    <section style="display:grid; gap:14px" aria-label="Ответ платы">
+      <div class="stats">
+        <div class="stat"><b id="tps">—</b><span>токенов в секунду</span></div>
+        <div class="stat"><b id="ms">—</b><span>мс на токен</span></div>
+        <div class="stat"><b id="ntok">0</b><span>токенов написано</span></div>
+        <div class="stat"><b id="pf">—</b><span>мс на чтение начала</span></div>
+      </div>
+      <div class="panel">
+        <div class="lbl">Ответ платы</div>
+        <div class="out" id="out" aria-live="polite"><span class="p">Подключите плату и нажмите «Написать».</span></div>
+        <div class="lbl">Время на каждый токен, мс</div>
+        <canvas id="spark" width="1200" height="140" aria-label="Время на каждый токен"></canvas>
+      </div>
+      <footer id="model">Модель: определится при подключении.</footer>
+    </section>
+  </div>
+</div>
+
+<script src="tokenizers.js"></script>
+<script src="bpe.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+let port = null, reader = null, writer = null, tok = null, info = null;
+let running = false, decode = null, times = [], count = 0, lineBuf = "";
+let temp = 700;
+
+function showErr(msg) { $("err").textContent = msg; $("err").hidden = !msg; }
+
+if (!("serial" in navigator)) {
+  showErr("Этот браузер не умеет подключаться к плате. Откройте страницу в Google Chrome или Microsoft Edge на компьютере.");
+  $("connect").disabled = true;
+}
+
+$("examples").addEventListener("click", (e) => { if (e.target.tagName === "BUTTON") $("prompt").value = e.target.textContent; });
+$("temp").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  temp = +b.dataset.t;
+  for (const x of $("temp").children) x.setAttribute("aria-pressed", x === b ? "true" : "false");
+});
+$("len").addEventListener("input", () => $("lenv").textContent = $("len").value);
+
+async function send(line) { await writer.write(new TextEncoder().encode(line + "\n")); }
+
+$("connect").addEventListener("click", async () => {
+  showErr("");
+  if (port) {                                   // reconnect: release the old port first
+    try { await reader.cancel(); } catch (e) {}
+    try { writer.releaseLock(); await port.close(); } catch (e) {}
+    port = null; info = null;
+  }
+  try {
+    port = await navigator.serial.requestPort();
+    await port.open({ baudRate: 115200, bufferSize: 65536 });
+    try { await port.setSignals({ dataTerminalReady: false, requestToSend: false }); } catch (e) {}
+    writer = port.writable.getWriter();
+    readLoop();
+    $("status").textContent = "Подключаюсь…";
+    setTimeout(() => send("I"), 400);
+    setTimeout(() => { if (!info) send("I"); }, 2500);
+  } catch (e) {
+    showErr("Не удалось открыть порт: " + e.message + ". Проверьте кабель и что порт не занят другой программой.");
+  }
+});
+
+async function readLoop() {
+  const dec = new TextDecoder();
+  reader = port.readable.getReader();
+  try {
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      lineBuf += dec.decode(value, { stream: true });
+      let i;
+      while ((i = lineBuf.indexOf("\n")) >= 0) {
+        const line = lineBuf.slice(0, i).trim();
+        lineBuf = lineBuf.slice(i + 1);
+        if (line) onLine(line);
+      }
+    }
+  } catch (e) {
+    showErr("Связь с платой потеряна: " + e.message);
+    $("status").className = "chip"; $("status").textContent = "Плата отключена";
+    $("go").disabled = true; $("stop").disabled = true;
+  }
+}
+
+function onLine(line) {
+  if (line.startsWith("READY ")) {
+    info = JSON.parse(line.slice(6));
+    const spec = window.TOKENIZERS[info.vocab];
+    if (!spec) { showErr("Неизвестная модель на плате (словарь " + info.vocab + ")."); return; }
+    tok = makeTokenizer(spec);
+    $("status").className = "chip on";
+    $("status").textContent = "Плата подключена";
+    $("model").textContent = `Модель: ${tok.label}. Ширина ${info.d}, слоёв ${info.layers}, словарь ${info.vout}, окно ${info.ctx} токенов. PSRAM ${info.psram_mhz} МГц, ${info.head_budget >= 1 ? 'выбор слова по всему словарю' : `двухступенчатый выбор слова (${Math.round(info.head_budget * 100)}% строк)`}.`;
+    $("go").disabled = running; $("ask").disabled = running;
+    $("connect").textContent = "Переподключить";
+    return;
+  }
+  if (line.startsWith("P ")) { $("pf").textContent = (+line.split(" ")[1]).toFixed(0); return; }
+  if (line.startsWith("T ")) {
+    const [, id, us] = line.split(" ").map(Number);
+    if (+us > 0) { times.push(us / 1000); drawSpark(); updateSpeed(); }
+    count++; $("ntok").textContent = count;
+    const text = decode(id);
+    if (text) {
+      const g = $("gen"), c = g.querySelector(".cursor");
+      g.insertBefore(document.createTextNode(text), c);
+      if (mode === "qa" && text.includes("\n")) send("X");   // an answer is one line
+    }
+    return;
+  }
+  if (line.startsWith("E ")) {
+    const ms = +line.split(" ")[2];
+    if (ms > 0) { $("ms").textContent = ms.toFixed(1); $("tps").textContent = (1000 / ms).toFixed(0); }
+    finish();
+    return;
+  }
+  if (line.startsWith("ERR")) showErr("Плата: " + line);
+}
+
+function updateSpeed() {
+  const last = times.slice(-16);
+  const avg = last.reduce((a, b) => a + b, 0) / last.length;
+  $("ms").textContent = avg.toFixed(1);
+  $("tps").textContent = (1000 / avg).toFixed(0);
+}
+
+function drawSpark() {
+  const c = $("spark"), g = c.getContext("2d");
+  const W = c.width, H = c.height, css = getComputedStyle(document.documentElement);
+  g.clearRect(0, 0, W, H);
+  if (!times.length) return;
+  const max = Math.max(20, ...times) * 1.1, n = Math.max(times.length, 60), bw = W / n;
+  g.fillStyle = css.getPropertyValue("--bar").trim();
+  times.forEach((t, i) => {
+    const h = Math.max(2, (t / max) * (H - 4));
+    g.fillRect(i * bw + 1, H - h, Math.max(1, bw - 2), h);
+  });
+  g.fillStyle = css.getPropertyValue("--ink-3").trim();
+  g.font = "22px IBM Plex Mono, monospace";
+  g.fillText(max.toFixed(0) + " мс", 6, 24);
+}
+
+function finish() {
+  running = false;
+  $("go").disabled = !info; $("ask").disabled = !info; $("stop").disabled = true;
+  const cur = document.querySelector(".cursor"); if (cur) cur.remove();
+}
+
+$("go").addEventListener("click", async () => {
+  if (!tok || running) return;
+  showErr("");
+  const text = $("prompt").value.replace(/\s+$/, "");
+  let ids = tok.encode(text);
+  if (!ids.length) { showErr("Напишите начало истории."); return; }
+  if (ids.length > info.max_prompt) ids = ids.slice(-info.max_prompt);
+  const room = info.ctx - ids.length;
+  const n = Math.max(1, Math.min(+$("len").value, room));
+  running = true; times = []; count = 0; decode = tok.decoder();
+  $("go").disabled = true; $("stop").disabled = false;
+  $("ntok").textContent = "0"; $("tps").textContent = "—"; $("ms").textContent = "—"; $("pf").textContent = "—";
+  $("out").innerHTML = "";
+  const p = document.createElement("span"); p.className = "p"; p.textContent = text;
+  const gen = document.createElement("span"); gen.id = "gen";
+  const cur = document.createElement("span"); cur.className = "cursor";
+  $("out").append(p, gen, cur);
+  drawSpark();
+  const seed = (Math.random() * 1e9) | 0;
+  await send("H 0.15");   // stories: two-stage head, 15% of rows
+  await send(`G ${n} ${temp} 40 ${seed} ${tok.eot} ${ids.length} ${ids.join(" ")}`);
+});
+
+$("stop").addEventListener("click", () => { if (running) send("X"); });
+
+// ---- questions about a story (model combo_qa, trained on train/qa_data.py) ----
+const STORIES = [
+  { title: "Lily и мяч", text: "Once upon a time, there was a little girl named Lily. She lived in a small house near the forest. One day, Lily went to the park with her mom. She found a shiny red ball under a big tree. Lily was very happy. She said, \"Mom, look at my new ball!\" They played with the ball until the sun went down.",
+    qs: ["What was the name of the girl?", "Who is Lily?", "Where did Lily go?", "What did Lily find?", "How did Lily feel?", "What did Lily say?"] },
+  { title: "Tom и Max", text: "Tom had a big brown dog named Max. Every day, Tom and Max played in the garden. One day, Max ran to the pond. Tom was scared, because the water was deep. He ran after Max and saw a little green frog on a rock. Max only wanted to play with the frog. Tom laughed and said, \"You silly dog!\"",
+    qs: ["What was the name of the dog?", "Who is Max?", "Where did Max run?", "How did Tom feel?", "What did Tom see?", "What did Tom say?"] },
+  { title: "Кот Ben", text: "There was a small cat named Ben. Ben liked to sleep in the sun. One morning, Ben walked to the kitchen. He saw a bowl of milk on the floor. Ben drank all the milk. Then he found a toy mouse under the chair. Ben was very excited. He played with the mouse all day.",
+    qs: ["What was the name of the cat?", "Who is Ben?", "Where did Ben walk?", "What did Ben find?", "What did Ben see?", "How did Ben feel?"] },
+];
+let mode = "story";
+function setStory(k) {
+  const s = STORIES[k];
+  $("story").value = s.text;
+  $("question").value = s.qs[0];
+  $("questions").innerHTML = "";
+  for (const q of s.qs) { const b = document.createElement("button"); b.type = "button"; b.textContent = q; $("questions").append(b); }
+}
+STORIES.forEach((s, k) => { const b = document.createElement("button"); b.type = "button"; b.textContent = s.title; b.dataset.k = k; $("stories").append(b); });
+$("stories").addEventListener("click", (e) => { if (e.target.dataset.k) setStory(+e.target.dataset.k); });
+$("questions").addEventListener("click", (e) => { if (e.target.tagName === "BUTTON") $("question").value = e.target.textContent; });
+setStory(0);
+$("mode").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  mode = b.dataset.m;
+  for (const x of $("mode").children) x.setAttribute("aria-pressed", x === b ? "true" : "false");
+  document.querySelector(".qa").hidden = mode !== "qa";
+  document.querySelector(".story").hidden = mode !== "story";
+});
+$("question").addEventListener("keydown", (e) => { if (e.key === "Enter") $("ask").click(); });
+$("ask").addEventListener("click", async () => {
+  if (!tok || running) return;
+  showErr("");
+  if (info.vocab !== 4096) { showErr("Модель на плате не обучена отвечать на вопросы. Прошейте модель combo_qa (engine/demo/flash_demo.sh COM6 combo_qa_s0)."); return; }
+  const story = $("story").value.trim(), q = $("question").value.trim();
+  if (!story || !q) { showErr("Нужны и сказка, и вопрос."); return; }
+  const ids = tok.encode(`${story}\nQuestion: ${q}\nAnswer:`);
+  const room = info.ctx - ids.length;
+  if (ids.length > info.max_prompt || room < 24) {
+    showErr(`Сказка слишком длинная: ${ids.length} токенов, а помещается около ${info.ctx - 40}. Сократите текст.`);
+    return;
+  }
+  running = true; times = []; count = 0; decode = tok.decoder();
+  $("ask").disabled = true; $("go").disabled = true; $("stop").disabled = false;
+  $("ntok").textContent = "0"; $("tps").textContent = "—"; $("ms").textContent = "—"; $("pf").textContent = "—";
+  $("out").innerHTML = "";
+  const p = document.createElement("span"); p.className = "p"; p.textContent = story;
+  const qq = document.createElement("span"); qq.className = "q"; qq.textContent = "Вопрос: " + q;
+  const gen = document.createElement("span"); gen.id = "gen"; gen.className = "a";
+  const cur = document.createElement("span"); cur.className = "cursor"; gen.append(cur);
+  $("out").append(p, qq, gen);
+  gen.textContent = ""; gen.append(cur);
+  drawSpark();
+  await send("H 1");      // answers copy names from the story: read every head row (fast screening misses rare name pieces)
+  await send(`G ${Math.min(40, room)} 0 1 1 ${tok.eot} ${ids.length} ${ids.join(" ")}`);
+});
+</script>
+</body>
+</html>

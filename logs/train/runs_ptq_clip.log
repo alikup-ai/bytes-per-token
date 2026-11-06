@@ -1,0 +1,14 @@
+
+== dense_s0  (val loss on 200k tokens)
+   fp32 1.9862 | ptq4 2.0221 | ptq2 3.4375
+   ptq4 MSE-clipped, half grid: 2.0174
+   ptq4 MSE-clipped, int grid: 2.0224
+   ptq2 MSE-clipped, half grid: 2.6203
+   ptq2 MSE-clipped, int grid: 3.5166
+
+== ple64_s0  (val loss on 200k tokens)
+   fp32 1.9462 | ptq4 1.9786 | ptq2 3.1774
+   ptq4 MSE-clipped, half grid: 1.9747
+   ptq4 MSE-clipped, int grid: 1.9793
+   ptq2 MSE-clipped, half grid: 2.6333
+   ptq2 MSE-clipped, int grid: 3.3159

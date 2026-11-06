@@ -1,0 +1,90 @@
+combo_s0: pack 2.44 MB (int4 weights+scales 1.90 MB), 77 tensors, torch int4 NLL 1.8764 on 510 targets
+== combo_s0 (3 board runs)
+1. PC engine vs PyTorch (same int4 weights)
+  [PASS] NLL within 0.02 of PyTorch  engine 1.8778 torch 1.8764 (+0.0014)
+  [PASS] argmax agreement >= 97%  98.44% of 512 positions
+  [PASS] logits close to PyTorch (int8 activations)  |dlogit| median 0.024; top-2 gap error median 0.031, p99 0.139 (logit std 2.89)
+  [PASS] greedy generations match PyTorch up to near ties  identical prefix per prompt: [48, 36, 48, 48, 21] of 48; torch top-2 gap where they split: 0.0192, 0.0265
+2. PC determinism, with the board's head budget
+  [PASS] two-stage head: read rows bit-identical to full head  626 of 4096 rows read, top-1 same as full head 99.61%
+  [PASS] two-stage head: top-1 agreement >= 98%
+  [PASS] two PC runs identical
+  [PASS] two-worker split identical
+3-5. board run 1/3
+    weights: SRAM 210 KB, PSRAM 825 KB, flash in place 1304 KB; load 52.5 ms
+  [PASS] run 1: pie2 == pie1 == ref1
+  [PASS] run 1: board == PC (bit-exact)
+3-5. board run 2/3
+  [PASS] run 2: pie2 == pie1 == ref1
+  [PASS] run 2: board == PC (bit-exact)
+3-5. board run 3/3
+  [PASS] run 3: pie2 == pie1 == ref1
+  [PASS] run 3: board == PC (bit-exact)
+  speed pie2: 10.21 ms/token = 97.9 tok/s (min 10.21, max 10.21, spread 0.0%, n=15)
+  speed pie1: 13.55 ms/token = 73.8 tok/s (min 13.55, max 13.55, spread 0.0%, n=6)
+  pie2 stages ms/token: input 0.27, attn_mv 2.60, attn 1.48, ffn 3.35, ple 1.30, head 1.22, att_rope_store 0.24, att_scores 0.41, att_softmax 0.27, att_v 0.54
+
+14/14 checks passed
+qat4_s0: pack 1.42 MB (int4 weights+scales 1.01 MB), 50 tensors, torch int4 NLL 1.8144 on 510 targets
+== qat4_s0 (1 board runs)
+1. PC engine vs PyTorch (same int4 weights)
+  [PASS] NLL within 0.02 of PyTorch  engine 1.8139 torch 1.8144 (-0.0006)
+  [PASS] argmax agreement >= 97%  99.22% of 512 positions
+  [PASS] logits close to PyTorch (int8 activations)  |dlogit| median 0.029; top-2 gap error median 0.030, p99 0.166 (logit std 2.98)
+  [PASS] greedy generations match PyTorch up to near ties  identical prefix per prompt: [48, 48, 48, 48, 48] of 48; torch top-2 gap where they split: none
+2. PC determinism, with the board's head budget
+  [PASS] two-stage head: read rows bit-identical to full head  626 of 4096 rows read, top-1 same as full head 99.41%
+  [PASS] two-stage head: top-1 agreement >= 98%
+  [PASS] two PC runs identical
+  [PASS] two-worker split identical
+3-5. board run 1/1
+    weights: SRAM 209 KB, PSRAM 823 KB, flash in place 320 KB; load 51.8 ms
+  [PASS] run 1: pie2 == pie1 == ref1
+  [PASS] run 1: board == PC (bit-exact)
+  speed pie2: 12.47 ms/token = 80.2 tok/s (min 12.47, max 12.48, spread 0.0%, n=5)
+  speed pie1: 16.05 ms/token = 62.3 tok/s (min 16.05, max 16.05, spread 0.0%, n=2)
+  pie2 stages ms/token: input 0.01, attn_mv 2.50, attn 1.47, ffn 7.28, ple 0.00, head 1.21, att_rope_store 0.24, att_scores 0.41, att_softmax 0.27, att_v 0.54
+
+10/10 checks passed
+relu_s0: pack 1.57 MB (int4 weights+scales 1.01 MB), 56 tensors, torch int4 NLL 1.8617 on 510 targets
+== relu_s0 (1 board runs)
+1. PC engine vs PyTorch (same int4 weights)
+  [PASS] NLL within 0.02 of PyTorch  engine 1.8609 torch 1.8617 (-0.0009)
+  [PASS] argmax agreement >= 97%  99.41% of 512 positions
+  [PASS] logits close to PyTorch (int8 activations)  |dlogit| median 0.025; top-2 gap error median 0.033, p99 0.135 (logit std 2.89)
+  [PASS] greedy generations match PyTorch up to near ties  identical prefix per prompt: [43, 48, 48, 20, 48] of 48; torch top-2 gap where they split: 0.0562, 0.0012
+2. PC determinism, with the board's head budget
+  [PASS] two-stage head: read rows bit-identical to full head  626 of 4096 rows read, top-1 same as full head 99.41%
+  [PASS] two-stage head: top-1 agreement >= 98%
+  [PASS] two PC runs identical
+  [PASS] two-worker split identical
+3-5. board run 1/1
+    weights: SRAM 209 KB, PSRAM 823 KB, flash in place 464 KB; load 51.9 ms
+  [PASS] run 1: pie2 == pie1 == ref1
+  [PASS] run 1: board == PC (bit-exact)
+  speed pie2: 8.96 ms/token = 111.6 tok/s (min 8.96, max 8.96, spread 0.0%, n=5)
+  speed pie1: 12.14 ms/token = 82.4 tok/s (min 12.14, max 12.14, spread 0.0%, n=2)
+  pie2 stages ms/token: input 0.01, attn_mv 2.51, attn 1.48, ffn 3.75, ple 0.00, head 1.22, att_rope_store 0.25, att_scores 0.41, att_softmax 0.27, att_v 0.54
+
+10/10 checks passed
+ple64_s0: pack 2.31 MB (int4 weights+scales 1.90 MB), 71 tensors, torch int4 NLL 1.8835 on 510 targets
+== ple64_s0 (1 board runs)
+1. PC engine vs PyTorch (same int4 weights)
+  [PASS] NLL within 0.02 of PyTorch  engine 1.8839 torch 1.8835 (+0.0004)
+  [PASS] argmax agreement >= 97%  98.83% of 512 positions
+  [PASS] logits close to PyTorch (int8 activations)  |dlogit| median 0.025; top-2 gap error median 0.030, p99 0.160 (logit std 2.90)
+  [PASS] greedy generations match PyTorch up to near ties  identical prefix per prompt: [48, 4, 48, 46, 48] of 48; torch top-2 gap where they split: 0.0089, 0.0021
+2. PC determinism, with the board's head budget
+  [PASS] two-stage head: read rows bit-identical to full head  626 of 4096 rows read, top-1 same as full head 99.61%
+  [PASS] two-stage head: top-1 agreement >= 98%
+  [PASS] two PC runs identical
+  [PASS] two-worker split identical
+3-5. board run 1/1
+    weights: SRAM 210 KB, PSRAM 825 KB, flash in place 1184 KB; load 52.4 ms
+  [PASS] run 1: pie2 == pie1 == ref1
+  [PASS] run 1: board == PC (bit-exact)
+  speed pie2: 12.99 ms/token = 77.0 tok/s (min 12.99, max 12.99, spread 0.0%, n=5)
+  speed pie1: 16.66 ms/token = 60.0 tok/s (min 16.66, max 16.66, spread 0.0%, n=2)
+  pie2 stages ms/token: input 0.26, attn_mv 2.58, attn 1.48, ffn 6.16, ple 1.30, head 1.21, att_rope_store 0.24, att_scores 0.41, att_softmax 0.27, att_v 0.54
+
+10/10 checks passed

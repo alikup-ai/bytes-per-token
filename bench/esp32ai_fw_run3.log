@@ -1,0 +1,28 @@
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x1 (POWERON),boot:0x8 (SPI_FAST_FLASH_BOOT)
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x116c
+load:0x403c8700,len:0xc2c
+load:0x403cb700,len:0x3108
+entry 0x403c88b8
+
+=== ESP32-S3 PLE TinyLM ===
+model: Vin=32768 Vout=25353 D=96 L=6 H=4 F=66 P=128  (mapped 15.6 MB)
+norms  -> SRAM   20 vectors
+hot set-> SRAM   21128 B dynamic + 8192 B static = 29320 B managed
+weights-> PSRAM  44 tensors int8, 4.19 MB allocated
+build: bytes=14912348 fp=a9bdd778 sram=29320B psram=4.19MB
+free: sram 299 KB | psram 3.74 MB
+
+>>> Once upon a time, there was a little girl named Lily. She loved to play outside in the sunshine. One day, she saw a big tree with a hole in it. She wanted to touch it, but she was too small.
+Lily's mom came to help her. She said, "Don't worry, Lily. I will help you." Lily was happy and said, "Thank you, mom. I will help you."
+They went to the tree and saw the hole. Lily was happy and said, "Thank you, mom. I love you." Her mom smiled and said, "You're welcome, Lily. You are a good friend."
+
+Once upon a time, there was a little girl named Lily. She loved to play outside in the park. One day, she saw a big tree with a tree. She wanted to climb the tree and see what was on the tree.
+Lily went to the tree and saw a big tree. She wanted to climb the tree
+
+--- 200 tokens in 19.24 s ---
+throughput: 10.39 tok/s   (94.1 ms/token)
+profile ms/token: input 2.1 | attn 20.5 | ffn 6.4 | ple 6.3 | head 58.8

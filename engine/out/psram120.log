@@ -1,0 +1,59 @@
+== bench, PSRAM 120 MHz
+WARNING: Deprecated: Option '--flash_mode' is deprecated. Use '--flash-mode' instead.
+WARNING: Deprecated: Option '--flash_freq' is deprecated. Use '--flash-freq' instead.
+WARNING: Deprecated: Option '--flash_size' is deprecated. Use '--flash-size' instead.
+WARNING: Deprecated: Command 'write_flash' is deprecated. Use 'write-flash' instead.
+BENCH {"test":"boot","psram_free":8386156,"sram_free":330031}
+BENCH {"test":"seq_read","tier":"sram","cores":1,"MBps":295.3}
+BENCH {"test":"seq_read","tier":"psram","cores":1,"MBps":121.8}
+BENCH {"test":"seq_read","tier":"psram","cores":2,"MBps":131.2}
+BENCH {"test":"seq_read","tier":"flash","cores":1,"MBps":46.5}
+BENCH {"test":"seq_read","tier":"flash","cores":2,"MBps":47.8}
+BENCH {"test":"flash_row","row_bytes":64,"us":2.60}
+BENCH {"test":"flash_row","row_bytes":256,"us":6.62}
+BENCH {"test":"flash_row","row_bytes":1024,"us":22.79}
+BENCH {"test":"gemv","kernel":"scalar_s8","tier":"sram","rows":1024,"cols":96,"cyc_per_mac":8.302,"weight_MBps":28.9,"match_ref":1}
+BENCH {"test":"gemv","kernel":"pie_s8","tier":"sram","rows":1024,"cols":96,"cyc_per_mac":0.386,"weight_MBps":622.2,"match_ref":1}
+BENCH {"test":"gemv","kernel":"scalar_q4","tier":"sram","rows":2048,"cols":96,"cyc_per_mac":10.087,"weight_MBps":11.9,"match_ref":1}
+BENCH {"test":"gemv","kernel":"pie_q4","tier":"sram","rows":2048,"cols":96,"cyc_per_mac":0.469,"weight_MBps":255.9,"match_ref":1}
+BENCH {"test":"gemv","kernel":"scalar_s8","tier":"psram","rows":16384,"cols":96,"cyc_per_mac":9.301,"weight_MBps":25.8,"match_ref":1}
+BENCH {"test":"gemv","kernel":"pie_s8","tier":"psram","rows":16384,"cols":96,"cyc_per_mac":2.118,"weight_MBps":113.3,"match_ref":1}
+BENCH {"test":"gemv","kernel":"scalar_q4","tier":"psram","rows":16384,"cols":96,"cyc_per_mac":10.588,"weight_MBps":11.3,"match_ref":1}
+BENCH {"test":"gemv","kernel":"pie_q4","tier":"psram","rows":16384,"cols":96,"cyc_per_mac":1.191,"weight_MBps":100.8,"match_ref":1}
+BENCH {"test":"gemv","kernel":"scalar_s8","tier":"flash","rows":16384,"cols":96,"cyc_per_mac":9.651,"weight_MBps":24.9,"match_ref":1}
+BENCH {"test":"gemv","kernel":"pie_s8","tier":"flash","rows":16384,"cols":96,"cyc_per_mac":5.306,"weight_MBps":45.2,"match_ref":1}
+BENCH {"test":"gemv","kernel":"scalar_q4","tier":"flash","rows":16384,"cols":96,"cyc_per_mac":10.789,"weight_MBps":11.1,"match_ref":1}
+BENCH {"test":"gemv","kernel":"pie_q4","tier":"flash","rows":16384,"cols":96,"cyc_per_mac":2.764,"weight_MBps":43.4,"match_ref":1}
+BENCH {"test":"gemv_dual","kernel":"pie_s8","tier":"psram","weight_MBps":126.3}
+BENCH {"test":"gemv_dual","kernel":"pie_q4","tier":"psram","weight_MBps":121.5}
+BENCH {"test":"dma_overlap","burst":16,"bytes":1048576,"dma_alone_MBps":40.2,"dma_with_compute_MBps":40.1,"compute_alone_us":25914,"compute_with_dma_us":26320}
+BENCH {"test":"dma_overlap","burst":32,"bytes":1048576,"dma_alone_MBps":60.2,"dma_with_compute_MBps":59.7,"compute_alone_us":17385,"compute_with_dma_us":17780}
+BENCH {"test":"dma_overlap","burst":64,"bytes":1048576,"dma_alone_MBps":68.8,"dma_with_compute_MBps":68.2,"compute_alone_us":15174,"compute_with_dma_us":15570}
+BENCH {"test":"done"}
+wrote C:\Users\User\Desktop\mcu-lm-research\bench\roofline.json
+== engine build combo_s0
+WARNING: Deprecated: Option '--flash_mode' is deprecated. Use '--flash-mode' instead.
+WARNING: Deprecated: Option '--flash_freq' is deprecated. Use '--flash-freq' instead.
+WARNING: Deprecated: Option '--flash_size' is deprecated. Use '--flash-size' instead.
+WARNING: Deprecated: Command 'write_flash' is deprecated. Use 'write-flash' instead.
+Traceback (most recent call last):
+  File "C:\Users\User\Desktop\mcu-lm-research\engine\test.py", line 212, in <module>
+    main()
+  File "C:\Users\User\Desktop\mcu-lm-research\engine\test.py", line 179, in main
+    bl = eng_lines(log)
+         ^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\mcu-lm-research\engine\test.py", line 40, in eng_lines
+    return [json.loads(l[l.index("ENG ") + 4:]) for l in text.splitlines() if "ENG {" in l]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\User\Desktop\mcu-lm-research\engine\test.py", line 40, in <listcomp>
+    return [json.loads(l[l.index("ENG ") + 4:]) for l in text.splitlines() if "ENG {" in l]
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Espressif\tools\python\Lib\json\__init__.py", line 346, in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Espressif\tools\python\Lib\json\decoder.py", line 337, in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Espressif\tools\python\Lib\json\decoder.py", line 355, in raw_decode
+    raise JSONDecodeError("Expecting value", s, err.value) from None
+json.decoder.JSONDecodeError: Expecting value: line 1 column 125 (char 124)

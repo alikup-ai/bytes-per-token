@@ -1,0 +1,61 @@
+15368 of 15926 held-out questions fit the board's 240-token prompt
+Q: What did Tim say?
+  board: Tim said, "Thank you, doctor. The doctor will be safe."
+  gold:  Tim said, "Thank you, doctor."
+Q: What was the name of the boy?
+  board: The boy was named Tim.
+  gold:  The boy was named Tim.
+Q: How did Jane feel?
+  board: Jane felt excited.
+  gold:  Jane felt excited.
+Q: Who is Mia?
+  board: Mia is a girl.
+  gold:  Mia is a girl.
+Q: How did Max feel?
+  board: Max felt proud.
+  gold:  Max felt proud.
+Q: What was the name of the cat?
+  board: The cat was named Tom.
+  gold:  The cat was named Tom.
+Q: Who is Velvet?
+  board: Velcome is a good dog.
+  gold:  Velvet is a good dog.
+  torch: Velvet is a good dog.
+Q: What was the name of the dog?
+  board: The dog was named Max.
+  gold:  The dog was named Max.
+Q: What did Tim say?
+  board: Tim said, "Max, you are so dirty! You are so dirty! You are so dirty now!"
+  gold:  Tim said, "Max, you are so dirty now!"
+Q: Who is Sue?
+  board: Sue is a girl.
+  gold:  Sue is a big girl.
+Q: How did Roy feel?
+  board: Ro felt sad.
+  gold:  Roy felt sad.
+Q: What did Andy see?
+  board: Andy saw a funny bird near the garden.
+  gold:  Andy saw the bird and yelled.
+  torch: Andy saw a funny bird.
+Q: Where did Spot run?
+  board: Spot ran to the ball and started to play with his big paws.
+  gold:  Spot ran to the ball with his big paws.
+Q: Where did Sue go?
+  board: Sue went to the big print.
+  gold:  Sue went to the big printer.
+Q: Who is Binky?
+  board: By is a clever little dog.
+  gold:  Binky is a clever little dog.
+  torch: Binky is a clever little dog.
+Q: What did Max have?
+  board: Max had a regular lip of the lip.
+  gold:  Max had a regular lip.
+
+board exact match: 84/100 = 84%; board answer == PyTorch answer: 94/100
+  How did              14/16
+  What did X <verb>    10/13
+  What did X say       1/4
+  What was             29/30
+  Where did            4/6
+  Who is               26/31
+story + question read in 1120 ms (batched), answer at 12.99 ms/token = 77 tok/s; PSRAM 80 MHz

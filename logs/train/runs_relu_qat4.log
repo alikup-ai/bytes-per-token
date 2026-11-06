@@ -1,0 +1,11 @@
+{"name": "relu_qat4_s0", "cfg": {"vocab": 4096, "d": 128, "layers": 6, "heads": 4, "ffn": 384, "ple": 0, "experts": 1, "seq_len": 256, "rope_theta": 10000.0, "act": "relu", "qbits": 4}, "stored_params": 1802240, "read_params": 1802368, "bytes_per_token_4bit": 901184.0, "steps": 2441, "tokens": 19996672, "lr": 0.003, "seed": 0, "batch": 32}
+{"step": 250, "tokens": 2048000, "train_loss": 3.150136709213257, "val_loss": 3.0838845664499357, "elapsed_s": 182.3}
+{"step": 500, "tokens": 4096000, "train_loss": 2.632509231567383, "val_loss": 2.638916112701963, "elapsed_s": 374.2}
+{"step": 750, "tokens": 6144000, "train_loss": 2.4666709899902344, "val_loss": 2.4329342961158704, "elapsed_s": 584.7}
+{"step": 1000, "tokens": 8192000, "train_loss": 2.287075996398926, "val_loss": 2.3039180215891744, "elapsed_s": 782.7}
+{"step": 1250, "tokens": 10240000, "train_loss": 2.274369716644287, "val_loss": 2.2161143848746443, "elapsed_s": 975.4}
+{"step": 1500, "tokens": 12288000, "train_loss": 2.0346717834472656, "val_loss": 2.1380007282261966, "elapsed_s": 1178.7}
+{"step": 1750, "tokens": 14336000, "train_loss": 2.253364324569702, "val_loss": 2.083560122723158, "elapsed_s": 1373.1}
+{"step": 2000, "tokens": 16384000, "train_loss": 1.9316225051879883, "val_loss": 2.044714630642255, "elapsed_s": 1566.4}
+{"step": 2250, "tokens": 18432000, "train_loss": 2.0986385345458984, "val_loss": 2.0175252928471292, "elapsed_s": 1761.8}
+{"step": 2441, "tokens": 19996672, "train_loss": 2.0667028427124023, "val_loss": 2.028247861207844, "elapsed_s": 2121.9}

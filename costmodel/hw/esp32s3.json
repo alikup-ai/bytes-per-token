@@ -1,0 +1,16 @@
+{
+  "name": "ESP32-S3 N16R8, dual LX7 @ 240 MHz, 8 MB OPI PSRAM, 16 MB QIO flash",
+  "f_hz": 240000000,
+  "bw_Bps": {
+    "psram@80":  {"1": 72e6, "2": 91e6},
+    "psram@120": {"1": 81e6, "2": 131e6},
+    "sram":      {"1": 1e12, "2": 1e12}
+  },
+  "flash_row_us": 20.3,
+  "sources": {
+    "psram@80/120": "esp32-tinyLLM BENCHMARKING.md, 'Is attention's core bandwidth-bound?' dual-core probe table; single-core figure moves 68-81 MB/s with code layout (+-5%)",
+    "flash_row_us": "esp32-ai RESULTS.md, flash random-read 512B row",
+    "sram": "treated as free: its cost is inside the fitted cycles/MAC",
+    "board": "Pre-board literature values, kept because the calibration engines were measured by their authors. Our board (docs/phase1-bench.md): PSRAM@80 86.7/89.8 MB/s seq read (PIE int4 stream 73.1/83.4), PSRAM@120 121.8/131.2, 256 B flash row 9.66 us. costmodel/ideas.py applies the board values (MEAS column). The psram@120 1-core figure (81) is a code-layout-sensitive tinyLLM probe, far below our 121.8"
+  }
+}

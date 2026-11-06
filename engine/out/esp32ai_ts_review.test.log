@@ -1,0 +1,76 @@
+1. PC engine vs PyTorch (same int4 weights)
+  [PASS] NLL within 0.02 of PyTorch  engine 2.1033 torch 2.1060 (-0.0027)
+  [PASS] argmax agreement >= 97%  98.63% of 512 positions
+  [PASS] logits close to PyTorch (int8 activations)  |dlogit| median 0.049; top-2 gap error median 0.034, p99 0.121 (logit std 3.43)
+  [PASS] greedy generations match PyTorch up to near ties  identical prefix per prompt: [33, 24, 200, 200, 63, 200] of 200; torch top-2 gap where they split: 0.0027, 0.0027, 0.1096
+2. PC determinism, with the board's head budget
+  [PASS] two-stage head: read rows bit-identical to full head  3861 of 25353 rows read, top-1 same as full head 99.80%
+  [PASS] two-stage head: top-1 agreement >= 98%
+  [PASS] batched = sequential (batch 1..16 give identical logits)  b1 52254fd6, b2 52254fd6, b4 52254fd6, b8 52254fd6, b16 52254fd6
+  [PASS] rewind: stepping back reproduces the logits  positions 60 -> 37, 5 redone
+  [PASS] two PC runs identical
+  [PASS] two-worker split identical
+3-5. board run 1/1
+    ENG {"test":"heapcheck","after":"llm_new","ok":1}
+    ENG {"test":"unit_colsum","cases":40,"bad_lanes":0,"first_bad_lane":-1,"cyc_call13_sram":261,"cyc_call13_unpack":257,"cyc_call13_cold_psram":2507}
+    ENG {"test":"micro","cyc_exp":138.9,"cyc_recip":89.0,"cyc_par2_empty":89.0,"cyc_q4g_4KB_sram":4443.9,"cyc_q4g_4KB_psram_cold":12541.8,"cyc_psram_random_load":16
+    ENG {"test":"heapcheck","after":"microbench","ok":1}
+    ENG {"label":"board","test":"config","vocab":32768,"d":96,"layers":6,"heads":4,"ffn":96,"ple":128,"act":0,"ctx":256,"pack_bytes":15424000,"load_ms":120.0,"weigh
+    ENG {"label":"pie2","test":"gen","prompt":0,"ids":[12,406,282,259,403,450,502,360,14,313,504,266,362,679,317,263,2098,14,508,358,12,338,417,259,410,673,344,259,
+    ENG {"label":"pie2","test":"gen","prompt":1,"ids":[313,504,266,362,679,317,263,2098,14,508,358,12,338,417,259,410,673,344,259,1343,317,304,14,313,448,266,1337,3
+    ENG {"label":"pie2","test":"gen","prompt":2,"ids":[619,266,362,344,304,14,314,619,266,362,344,304,265,548,304,939,14,314,619,266,362,344,352,678,265,726,525,263
+    ENG {"label":"pie2","test":"gen","prompt":3,"ids":[299,1218,436,1959,265,263,1218,436,1959,14,299,1218,436,1959,265,263,1218,436,1959,14,299,1218,436,1959,265,2
+    ENG {"label":"pie2","test":"gen","prompt":4,"ids":[410,12,921,678,14,299,635,282,395,408,265,448,266,362,344,304,14,199,382,635,448,266,362,344,263,678,12,354,2
+    ENG {"label":"pie2","test":"gen","prompt":5,"ids":[41,805,722,12,649,14,337,282,785,607,14,1294,369,469,526,1533,491,199,790,517,265,329,12,335,2075,1884,12,360
+    ENG {"label":"pie2","test":"rewind","from":60,"to":37,"redone":5,"ok":1}
+    ENG {"label":"pie2","test":"poscurve","bucket":32,"first_pos":4,"ms_per_tok":[8.983,9.678,10.316,11.083,11.759,12.459,13.204,13.899]}
+    ENG {"label":"pie2","test":"speed","rep":0,"tokens":200,"ms_per_tok":10.875,"stage_ms_per_tok":{"input":0.714,"attn_mv":1.581,"attn":2.601,"ffn":1.330,"ple":1.2
+    ENG {"label":"pie2","test":"speed","rep":1,"tokens":200,"ms_per_tok":10.874,"stage_ms_per_tok":{"input":0.713,"attn_mv":1.581,"attn":2.601,"ffn":1.330,"ple":1.2
+    ENG {"label":"pie2","test":"speed","rep":2,"tokens":200,"ms_per_tok":10.874,"stage_ms_per_tok":{"input":0.714,"attn_mv":1.581,"attn":2.601,"ffn":1.330,"ple":1.2
+    ENG {"label":"pie2","test":"speed","rep":3,"tokens":200,"ms_per_tok":10.875,"stage_ms_per_tok":{"input":0.714,"attn_mv":1.581,"attn":2.601,"ffn":1.330,"ple":1.2
+    ENG {"label":"pie2","test":"speed","rep":4,"tokens":200,"ms_per_tok":10.874,"stage_ms_per_tok":{"input":0.714,"attn_mv":1.581,"attn":2.601,"ffn":1.330,"ple":1.2
+    ENG {"label":"pie2","test":"batch","tokens":64,"runs":[{"batch":1,"ms_per_tok":9.287,"last_logits_digest":"52254fd6"},{"batch":2,"ms_per_tok":6.202,"last_logits
+    ENG {"label":"pie2","test":"eval","targets":510,"nll":2.103263,"nll_sum_bits":"44861545","argmax_digest":"ae24dce9","screen_budget":0.150,"screen_rows":3861.4,"
+    ENG {"label":"pie2full","test":"speed","rep":0,"tokens":200,"ms_per_tok":24.813,"stage_ms_per_tok":{"input":0.722,"attn_mv":1.576,"attn":2.601,"ffn":1.330,"ple"
+    ENG {"label":"pie2full","test":"speed","rep":1,"tokens":200,"ms_per_tok":24.811,"stage_ms_per_tok":{"input":0.722,"attn_mv":1.576,"attn":2.601,"ffn":1.330,"ple"
+    ENG {"label":"pie2full","test":"speed","rep":2,"tokens":200,"ms_per_tok":24.812,"stage_ms_per_tok":{"input":0.722,"attn_mv":1.576,"attn":2.601,"ffn":1.330,"ple"
+    ENG {"label":"pie2warm","test":"speed","rep":0,"tokens":200,"ms_per_tok":11.327,"stage_ms_per_tok":{"input":0.714,"attn_mv":1.582,"attn":1.145,"ffn":1.327,"ple"
+    ENG {"label":"pie2warm","test":"speed","rep":1,"tokens":200,"ms_per_tok":11.327,"stage_ms_per_tok":{"input":0.714,"attn_mv":1.582,"attn":1.145,"ffn":1.327,"ple"
+    ENG {"label":"pie2warm","test":"speed","rep":2,"tokens":200,"ms_per_tok":11.328,"stage_ms_per_tok":{"input":0.714,"attn_mv":1.582,"attn":1.145,"ffn":1.327,"ple"
+    ENG {"label":"pie2warm","test":"eval","targets":510,"nll":2.103263,"nll_sum_bits":"44861545","argmax_digest":"ae24dce9","screen_budget":0.150,"screen_rows":3861
+    ENG {"label":"pie1","test":"gen","prompt":0,"ids":[12,406,282,259,403,450,502,360,14,313,504,266,362,679,317,263,2098,14,508,358,12,338,417,259,410,673,344,259,
+    ENG {"label":"pie1","test":"gen","prompt":1,"ids":[313,504,266,362,679,317,263,2098,14,508,358,12,338,417,259,410,673,344,259,1343,317,304,14,313,448,266,1337,3
+    ENG {"label":"pie1","test":"gen","prompt":2,"ids":[619,266,362,344,304,14,314,619,266,362,344,304,265,548,304,939,14,314,619,266,362,344,352,678,265,726,525,263
+    ENG {"label":"pie1","test":"gen","prompt":3,"ids":[299,1218,436,1959,265,263,1218,436,1959,14,299,1218,436,1959,265,263,1218,436,1959,14,299,1218,436,1959,265,2
+    ENG {"label":"pie1","test":"gen","prompt":4,"ids":[410,12,921,678,14,299,635,282,395,408,265,448,266,362,344,304,14,199,382,635,448,266,362,344,263,678,12,354,2
+    ENG {"label":"pie1","test":"gen","prompt":5,"ids":[41,805,722,12,649,14,337,282,785,607,14,1294,369,469,526,1533,491,199,790,517,265,329,12,335,2075,1884,12,360
+    ENG {"label":"pie1","test":"rewind","from":60,"to":37,"redone":5,"ok":1}
+    ENG {"label":"pie1","test":"speed","rep":0,"tokens":200,"ms_per_tok":13.738,"stage_ms_per_tok":{"input":0.836,"attn_mv":1.970,"attn":3.672,"ffn":1.624,"ple":1.5
+    ENG {"label":"pie1","test":"speed","rep":1,"tokens":200,"ms_per_tok":13.738,"stage_ms_per_tok":{"input":0.836,"attn_mv":1.970,"attn":3.672,"ffn":1.624,"ple":1.5
+    ENG {"label":"pie1","test":"batch","tokens":64,"runs":[{"batch":1,"ms_per_tok":11.568,"last_logits_digest":"52254fd6"},{"batch":2,"ms_per_tok":8.213,"last_logit
+    ENG {"label":"pie1","test":"eval","targets":510,"nll":2.103263,"nll_sum_bits":"44861545","argmax_digest":"ae24dce9","screen_budget":0.150,"screen_rows":3861.4,"
+    ENG {"label":"ref1","test":"gen","prompt":0,"ids":[12,406,282,259,403,450,502,360,14,313,504,266,362,679,317,263,2098,14,508,358,12,338,417,259,410,673,344,259,
+    ENG {"label":"ref1","test":"gen","prompt":1,"ids":[313,504,266,362,679,317,263,2098,14,508,358,12,338,417,259,410,673,344,259,1343,317,304,14,313,448,266,1337,3
+    ENG {"label":"ref1","test":"gen","prompt":2,"ids":[619,266,362,344,304,14,314,619,266,362,344,304,265,548,304,939,14,314,619,266,362,344,352,678,265,726,525,263
+    ENG {"label":"ref1","test":"gen","prompt":3,"ids":[299,1218,436,1959,265,263,1218,436,1959,14,299,1218,436,1959,265,263,1218,436,1959,14,299,1218,436,1959,265,2
+    ENG {"label":"ref1","test":"gen","prompt":4,"ids":[410,12,921,678,14,299,635,282,395,408,265,448,266,362,344,304,14,199,382,635,448,266,362,344,263,678,12,354,2
+    ENG {"label":"ref1","test":"gen","prompt":5,"ids":[41,805,722,12,649,14,337,282,785,607,14,1294,369,469,526,1533,491,199,790,517,265,329,12,335,2075,1884,12,360
+    ENG {"label":"ref1","test":"rewind","from":60,"to":37,"redone":5,"ok":1}
+    ENG {"label":"ref1","test":"batch","tokens":64,"runs":[{"batch":1,"ms_per_tok":64.149,"last_logits_digest":"52254fd6"},{"batch":2,"ms_per_tok":51.144,"last_logi
+    ENG {"label":"ref1","test":"eval","targets":510,"nll":2.103263,"nll_sum_bits":"44861545","argmax_digest":"ae24dce9","screen_budget":0.150,"screen_rows":3861.4,"
+    ENG {"test":"done"}
+    weights: SRAM 52 KB, PSRAM 2181 KB, flash in place 12696 KB; load 120.0 ms
+  [PASS] run 1: pie2 == pie1 == ref1
+  [PASS] run 1: board == PC (bit-exact)
+  pie2 ms/token by position (32 per bucket, from 4): 8.98, 9.68, 10.32, 11.08, 11.76, 12.46, 13.20, 13.90
+  speed pie2: 10.87 ms/token = 92.0 tok/s (min 10.87, max 10.88, spread 0.0%, n=5)
+  batch (64 known tokens) ms/token: n=1 9.29, n=2 6.20, n=4 4.65, n=8 3.88, n=16 3.50
+  speed pie1: 13.74 ms/token = 72.8 tok/s (min 13.74, max 13.74, spread 0.0%, n=2)
+  batch (64 known tokens) ms/token: n=1 9.29, n=2 6.20, n=4 4.65, n=8 3.88, n=16 3.50
+  speed pie2full: 24.81 ms/token = 40.3 tok/s (min 24.81, max 24.81, spread 0.0%, n=3)
+  batch (64 known tokens) ms/token: n=1 9.29, n=2 6.20, n=4 4.65, n=8 3.88, n=16 3.50
+  speed pie2warm: 11.33 ms/token = 88.3 tok/s (min 11.33, max 11.33, spread 0.0%, n=3)
+  batch (64 known tokens) ms/token: n=1 9.29, n=2 6.20, n=4 4.65, n=8 3.88, n=16 3.50
+  pie2 stages ms/token: input 0.71, attn_mv 1.58, attn 2.60, ffn 1.33, ple 1.29, head 3.35, att_rope_store 0.16, att_scores 1.02, att_softmax 0.64, att_v 0.77
+
+12/12 checks passed

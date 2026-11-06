@@ -1,0 +1,17 @@
+{
+  "_doc": "Placement and parallelism rules per inference engine, read from each engine's source. Fitted cycle costs are NOT stored here; validate.py fits them from calibration runs every time.",
+  "esp32ai-c-int8": {
+    "source": "refs/esp32-ai/runtime/llm.h + firmware/*/ *.ino: 44 tensors staged int8 in PSRAM, fp32 row scale; embedding and PLE rows from mmap flash; KV fp32 PSRAM; matvec_par splits rows>=128 across both cores; attention single core",
+    "core": {"bits": 8, "scale_bytes": 4, "tier": "psram"},
+    "head": {"bits": 8, "scale_bytes": 4, "tier": "psram"},
+    "dual_all": false, "dual_min_rows": 128,
+    "kv_bytes": 4, "kv_tier": "psram", "attn_cores": 1
+  },
+  "tinyllm-rust-int4": {
+    "source": "refs/esp32-tinyLLM engine/llm-firmware README: core int4 read in place from mmap flash (group 128, fp16 scale); head staged packed int4 in PSRAM; every matvec and attention heads split across both cores; KV fp32 PSRAM",
+    "core": {"bits": 4, "scale_bytes": 2, "group": 128, "tier": "flash"},
+    "head": {"bits": 4, "scale_bytes": 2, "group": 128, "tier": "psram"},
+    "dual_all": true, "dual_min_rows": 0,
+    "kv_bytes": 4, "kv_tier": "psram", "attn_cores": 2
+  }
+}

@@ -1,0 +1,17 @@
+model d=128 L=6 vocab=4096 PSRAM 80 MHz, 19 stop tokens
+
+Once upon a time, there was a little girl named Lily. She lived in a small house with her mom and dad. Every day, she would go to the park to play with her friends. One day, Lily saw a big. She said, "Mom!" In the end, Lily's mom said.
+  tokens: 30 generated + 33 from the template (52% fixed)
+  token by token:   574.4 ms  (slots 276.8 + fixed 297.6)
+  batched fixed:    468.1 ms  (slots 276.9 + fixed 191.2)  -> x1.23 faster
+  free generation of the same 63 tokens would take ~581.4 ms -> template x1.24
+  same tokens in both modes: yes
+
+Tom had a big red ball. He liked to play with his ball. His mom said, "I want to play with my ball." Tom was sad. The next day, Tom went to the park to play. From that day on, Tom and his mom always played with the ball.
+  tokens: 29 generated + 30 from the template (51% fixed)
+  token by token:   533.8 ms  (slots 265.6 + fixed 268.3)
+  batched fixed:    440.5 ms  (slots 265.7 + fixed 174.8)  -> x1.21 faster
+  free generation of the same 59 tokens would take ~540.5 ms -> template x1.23
+  same tokens in both modes: yes
+
+ALL OK

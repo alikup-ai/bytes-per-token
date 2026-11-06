@@ -1,0 +1,7 @@
+# Overlay: octal PSRAM at 120 MHz (experimental in ESP-IDF: "works when the
+# temperature is stable"). Built into build120/ so the 80 MHz build is untouched:
+#   idf.py -B build120 -D SDKCONFIG=sdkconfig.120 -D SDKCONFIG_DEFAULTS="sdkconfig.defaults;sdkconfig.psram120" build
+CONFIG_IDF_EXPERIMENTAL_FEATURES=y
+CONFIG_SPIRAM_SPEED_120M=y
+# Flash shares the MSPI clock with PSRAM: PSRAM 120 MHz needs flash at 120 MHz too (STR).
+CONFIG_ESPTOOLPY_FLASHFREQ_120M=y

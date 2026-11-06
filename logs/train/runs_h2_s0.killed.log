@@ -1,0 +1,8 @@
+{"name": "dense_s0", "cfg": {"vocab": 4096, "d": 128, "layers": 6, "heads": 4, "ffn": 384, "ple": 0, "experts": 1, "seq_len": 256, "rope_theta": 10000.0}, "stored_params": 1802240, "read_params": 1802368, "bytes_per_token_4bit": 901184.0, "steps": 2441, "tokens": 19996672, "lr": 0.003, "seed": 0, "batch": 32}
+{"step": 250, "tokens": 2048000, "train_loss": 3.149811267852783, "val_loss": 3.0998196672080573, "elapsed_s": 241.7}
+{"step": 500, "tokens": 4096000, "train_loss": 2.6115641593933105, "val_loss": 2.631136166454125, "elapsed_s": 579.3}
+{"step": 750, "tokens": 6144000, "train_loss": 2.4628000259399414, "val_loss": 2.4072674984510667, "elapsed_s": 825.5}
+{"step": 1000, "tokens": 8192000, "train_loss": 2.254441976547241, "val_loss": 2.2812471087549775, "elapsed_s": 4632.0}
+{"step": 1250, "tokens": 10240000, "train_loss": 2.2353572845458984, "val_loss": 2.1804031501506262, "elapsed_s": 5491.8}
+{"step": 1500, "tokens": 12288000, "train_loss": 1.9968712329864502, "val_loss": 2.1077581288414637, "elapsed_s": 6310.2}
+{"step": 1750, "tokens": 14336000, "train_loss": 2.2096614837646484, "val_loss": 2.0484274126656077, "elapsed_s": 7310.4}

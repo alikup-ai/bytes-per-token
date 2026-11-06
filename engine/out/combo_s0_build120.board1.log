@@ -1,0 +1,119 @@
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x1 (POWERON),boot:0x8 (SPI_FAST_FLASH_BOOT)
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x1668
+load:0x403c8700,len:0xec0
+load:0x403cb700,len:0x3178
+entry 0x403c894c
+I (24) boot: ESP-IDF v5.5.5 2nd stage bootloader
+I (25) boot: compile time Sep 26 2026 22:52:01
+I (25) boot: Multicore bootloader
+I (25) boot: chip revision: v0.2
+I (28) boot: efuse block revision: v1.3
+I (31) qio_mode: Enabling default flash chip QIO
+I (36) boot.esp32s3: Boot SPI Speed : 80MHz
+I (40) boot.esp32s3: SPI Mode       : QIO
+I (43) boot.esp32s3: SPI Flash Size : 16MB
+I (47) boot: Enabling RNG early entropy source...
+I (52) boot: Partition Table:
+I (54) boot: ## Label            Usage          Type ST Offset   Length
+I (61) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+I (67) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+I (74) boot:  2 factory          factory app      00 00 00010000 00080000
+I (80) boot:  3 model            Unknown data     01 40 00090000 00f70000
+I (87) boot: End of partition table
+I (90) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0aa58h ( 43608) map
+I (104) esp_image: segment 1: paddr=0001aa80 vaddr=3fc97100 size=03620h ( 13856) load
+I (107) esp_image: segment 2: paddr=0001e0a8 vaddr=40378000 size=01f70h (  8048) load
+I (114) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=1fcc4h (130244) map
+I (140) esp_image: segment 4: paddr=0003fcec vaddr=40379f70 size=0d13ch ( 53564) load
+I (151) esp_image: segment 5: paddr=0004ce30 vaddr=50000000 size=00020h (    32) load
+I (157) boot: Loaded app from partition at offset 0x10000
+I (158) boot: Disabling RNG early entropy source...
+W (169) flash HPM: HPM mode is optional feature that depends on flash model. Read Docs First!
+W (169) flash HPM: HPM mode with DC adjustment is disabled. Some flash models may not be supported. Read Docs First!
+W (176) flash HPM: High performance mode of this flash model hasn't been supported.
+I (183) MSPI Timing: Enter flash timing tuning
+I (188) octal_psram: vendor id    : 0x0d (AP)
+I (191) octal_psram: dev id       : 0x02 (generation 3)
+I (196) octal_psram: density      : 0x03 (64 Mbit)
+I (201) octal_psram: good-die     : 0x01 (Pass)
+I (205) octal_psram: Latency      : 0x01 (Fixed)
+I (209) octal_psram: VCC          : 0x01 (3V)
+I (214) octal_psram: SRF          : 0x01 (Fast Refresh)
+I (218) octal_psram: BurstType    : 0x01 (Hybrid Wrap)
+I (223) octal_psram: BurstLen     : 0x01 (32 Byte)
+I (228) octal_psram: Readlatency  : 0x02 (10 cycles@Fixed)
+I (233) octal_psram: DriveStrength: 0x00 (1/1)
+I (237) MSPI Timing: Enter psram timing tuning
+I (246) esp_psram: Found 8MB PSRAM device
+I (246) esp_psram: Speed: 120MHz
+I (248) cpu_start: Multicore app
+I (456) esp_psram: SPI SRAM memory test OK
+I (465) cpu_start: GPIO 44 and 43 are used as console UART I/O pins
+I (465) cpu_start: Pro cpu start user code
+I (465) cpu_start: cpu freq: 240000000 Hz
+I (467) app_init: Application information:
+I (471) app_init: Project name:     mculm_engine
+I (475) app_init: App version:      1
+I (478) app_init: Compile time:     Sep 26 2026 22:51:07
+I (483) app_init: ELF file SHA256:  fce1af995...
+I (488) app_init: ESP-IDF:          v5.5.5
+I (492) efuse_init: Min chip rev:     v0.0
+I (495) efuse_init: Max chip rev:     v0.99
+I (499) efuse_init: Chip rev:         v0.2
+I (503) heap_init: Initializing. RAM available for dynamic allocation:
+I (510) heap_init: At 3FC9C088 len 0004D688 (309 KiB): RAM
+I (515) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM
+I (520) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM
+I (525) esp_psram: Adding pool of 8192K of PSRAM memory to heap allocator
+I (532) spi_flash: detected chip: boya
+I (535) spi_flash: flash io: qio
+I (538) sleep_gpio: Configure to isolate all GPIO pins in sleep state
+I (544) sleep_gpio: Enable automatic switching of GPIO sleep configuration
+I (551) main_task: Started on CPU0
+I (571) esp_psram: Reserving pool of 32K of internal memory for DMA/internal allocations
+I (571) main_task: Calling app_main()
+ENG {"test":"heapcheck","after":"llm_new","ok":1}
+ENG {"test":"unit_colsum","cases":40,"bad_lanes":0,"first_bad_lane":-1,"cyc_call13_sram":256,"cyc_call13_unpack":258,"cyc_call13_cold_psram":1860}
+ENG {"test":"micro","cyc_exp":134.5,"cyc_recip":90.0,"cyc_par2_empty":83.0,"cyc_q4g_4KB_sram":4575.8,"cyc_q4g_4KB_psram_cold":9315.2,"cyc_psram_random_load":115.5}
+ENG {"test":"heapcheck","after":"microbench","ok":1}
+ENG {"label":"board","test":"config","vocab":4096,"d":128,"layers":6,"heads":4,"ffn":320,"ple":64,"act":1,"ctx":256,"pack_bytes":2436288,"load_ms":37.1,"weights_sram":196868,"weights_psram":862720,"flash_inplace":1335296,"sram_free":25711,"psram_free":6915176}
+ENG {"label":"pie2","test":"gen","prompt":0,"ids":[339,364,259,346,614,370,620,14,405,502,266,324,329,336,620,267,531,491,376,14,528,327,12,392,505,259,346,614,314,336,705,14,339,283,378,376,14,199,664,407,266,538,578,283,744,263,614,14],"tok_digest":"bb9ab37d","logit_digest":"f2205fa0","prefill_ms":60.24,"ms_per_tok":7.455,"stage_ms_per_tok":{"input":0.240,"attn_mv":1.918,"attn":1.063,"ffn":2.522,"ple":0.784,"head":0.927,"att_rope_store":0.152,"att_scores":0.275,"att_softmax":0.226,"att_v":0.397},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":5.068,"elem":0.207,"head_select":0.263,"sparse_book":0.116,"att_warm":0.000},"head_rows_per_tok":627.1}
+ENG {"label":"pie2","test":"gen","prompt":1,"ids":[527,266,324,329,342,478,14,316,529,1785,309,267,1122,309,14,316,529,1785,309,267,1122,309,14,316,283,378,376,14,199,383,327,12,415,382,259,346,495,14,316,407,266,893,309,14,316,1344,366,263],"tok_digest":"d822d6d3","logit_digest":"0dcff654","prefill_ms":37.23,"ms_per_tok":7.346,"stage_ms_per_tok":{"input":0.239,"attn_mv":1.917,"attn":0.962,"ffn":2.527,"ple":0.784,"head":0.916,"att_rope_store":0.152,"att_scores":0.240,"att_softmax":0.198,"att_v":0.359},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":5.063,"elem":0.207,"head_select":0.257,"sparse_book":0.118,"att_warm":0.000},"head_rows_per_tok":625.8}
+ENG {"label":"pie2","test":"gen","prompt":2,"ids":[312,406,1928,267,1928,14,199,383,327,12,259,391,475,402,405,550,266,263,524,14,339,382,263,812,267,407,266,324,14,405,325,12,317,1101,12,338,739,405,14,1205,349,369,266,324,329,518,477,285],"tok_digest":"89f48832","logit_digest":"87358520","prefill_ms":46.53,"ms_per_tok":7.382,"stage_ms_per_tok":{"input":0.240,"attn_mv":1.918,"attn":1.003,"ffn":2.510,"ple":0.784,"head":0.926,"att_rope_store":0.152,"att_scores":0.254,"att_softmax":0.209,"att_v":0.375},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":5.057,"elem":0.207,"head_select":0.262,"sparse_book":0.115,"att_warm":0.000},"head_rows_per_tok":625.0}
+ENG {"label":"pie2","test":"gen","prompt":3,"ids":[346,614,14,285,614,283,378,346,267,364,661,1288,14,285,464,407,266,324,329,263,614,14,199,411,464,653,266,573,263,614,314,263,614,12,409,309,283,423,1560,14,285,614,1060,604,267,1553,14,285],"tok_digest":"6aca4255","logit_digest":"6379de38","prefill_ms":37.34,"ms_per_tok":7.310,"stage_ms_per_tok":{"input":0.241,"attn_mv":1.920,"attn":0.963,"ffn":2.479,"ple":0.784,"head":0.923,"att_rope_store":0.152,"att_scores":0.240,"att_softmax":0.198,"att_v":0.360},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":5.030,"elem":0.206,"head_select":0.260,"sparse_book":0.113,"att_warm":0.000},"head_rows_per_tok":626.0}
+ENG {"label":"pie2","test":"gen","prompt":4,"ids":[736,12,719,1,338,498,259,1252,386,349,397,199,843,563,267,325,12,317,736,12,719,14,338,865,349,423,14,539,349,498,266,322,846,329,626,620,14,616,498,266,322,846,267,2653,519,14,616,498],"tok_digest":"8e8aa136","logit_digest":"a4f0bdb3","prefill_ms":20.04,"ms_per_tok":7.298,"stage_ms_per_tok":{"input":0.241,"attn_mv":1.918,"attn":0.882,"ffn":2.542,"ple":0.783,"head":0.931,"att_rope_store":0.152,"att_scores":0.212,"att_softmax":0.175,"att_v":0.329},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":5.092,"elem":0.207,"head_select":0.260,"sparse_book":0.118,"att_warm":0.000},"head_rows_per_tok":626.5}
+ENG {"label":"pie2","test":"speed","rep":0,"tokens":48,"ms_per_tok":7.453,"stage_ms_per_tok":{"input":0.239,"attn_mv":1.918,"attn":1.062,"ffn":2.522,"ple":0.784,"head":0.926,"att_rope_store":0.152,"att_scores":0.274,"att_softmax":0.226,"att_v":0.396},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":5.067,"elem":0.207,"head_select":0.263,"sparse_book":0.116,"att_warm":0.000},"head_rows_per_tok":627.1}
+ENG {"label":"pie2","test":"speed","rep":1,"tokens":48,"ms_per_tok":7.454,"stage_ms_per_tok":{"input":0.240,"attn_mv":1.918,"attn":1.062,"ffn":2.522,"ple":0.784,"head":0.927,"att_rope_store":0.152,"att_scores":0.274,"att_softmax":0.226,"att_v":0.397},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":5.067,"elem":0.207,"head_select":0.263,"sparse_book":0.116,"att_warm":0.000},"head_rows_per_tok":627.1}
+ENG {"label":"pie2","test":"speed","rep":2,"tokens":48,"ms_per_tok":7.455,"stage_ms_per_tok":{"input":0.240,"attn_mv":1.919,"attn":1.063,"ffn":2.522,"ple":0.785,"head":0.927,"att_rope_store":0.152,"att_scores":0.274,"att_softmax":0.226,"att_v":0.397},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":5.068,"elem":0.207,"head_select":0.263,"sparse_book":0.116,"att_warm":0.000},"head_rows_per_tok":627.1}
+ENG {"label":"pie2","test":"speed","rep":3,"tokens":48,"ms_per_tok":7.454,"stage_ms_per_tok":{"input":0.240,"attn_mv":1.918,"attn":1.063,"ffn":2.522,"ple":0.784,"head":0.927,"att_rope_store":0.152,"att_scores":0.274,"att_softmax":0.226,"att_v":0.397},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":5.068,"elem":0.207,"head_select":0.263,"sparse_book":0.116,"att_warm":0.000},"head_rows_per_tok":627.1}
+ENG {"label":"pie2","test":"speed","rep":4,"tokens":48,"ms_per_tok":7.454,"stage_ms_per_tok":{"input":0.240,"attn_mv":1.918,"attn":1.063,"ffn":2.521,"ple":0.784,"head":0.927,"att_rope_store":0.152,"att_scores":0.275,"att_softmax":0.226,"att_v":0.397},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":5.067,"elem":0.207,"head_select":0.263,"sparse_book":0.116,"att_warm":0.000},"head_rows_per_tok":627.1}
+ENG {"label":"pie2","test":"batch","tokens":64,"runs":[{"batch":1,"ms_per_tok":7.330,"last_logits_digest":"5aaf2874"},{"batch":2,"ms_per_tok":6.009,"last_logits_digest":"5aaf2874"},{"batch":4,"ms_per_tok":5.323,"last_logits_digest":"5aaf2874"},{"batch":8,"ms_per_tok":5.005,"last_logits_digest":"5aaf2874"},{"batch":16,"ms_per_tok":4.866,"last_logits_digest":"5aaf2874"}]}
+ENG {"label":"pie2","test":"eval","targets":510,"nll":1.876600,"nll_sum_bits":"446f443b","argmax_digest":"b822239d","screen_budget":0.150,"screen_rows":626.1,"screen_top1_agree":0.9961,"screen_read_mismatch":0,"stage_ms_per_tok":{"input":0.246,"attn_mv":1.926,"attn":2.751,"ffn":2.535,"ple":0.784,"head":2.745,"att_rope_store":0.157,"att_scores":0.927,"att_softmax":0.736,"att_v":0.915},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":7.857,"elem":0.207,"head_select":0.316,"sparse_book":0.116,"att_warm":0.000},"head_rows_per_tok":4096.0}
+ENG {"label":"pie2full","test":"speed","rep":0,"tokens":48,"ms_per_tok":9.258,"stage_ms_per_tok":{"input":0.239,"attn_mv":1.918,"attn":1.062,"ffn":2.510,"ple":0.784,"head":2.745,"att_rope_store":0.152,"att_scores":0.274,"att_softmax":0.226,"att_v":0.397},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":7.133,"elem":0.207,"head_select":0.000,"sparse_book":0.115,"att_warm":0.000},"head_rows_per_tok":4096.0}
+ENG {"label":"pie2full","test":"speed","rep":1,"tokens":48,"ms_per_tok":9.259,"stage_ms_per_tok":{"input":0.239,"attn_mv":1.918,"attn":1.063,"ffn":2.510,"ple":0.784,"head":2.746,"att_rope_store":0.152,"att_scores":0.275,"att_softmax":0.226,"att_v":0.397},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":7.134,"elem":0.206,"head_select":0.000,"sparse_book":0.115,"att_warm":0.000},"head_rows_per_tok":4096.0}
+ENG {"label":"pie2full","test":"speed","rep":2,"tokens":48,"ms_per_tok":9.260,"stage_ms_per_tok":{"input":0.239,"attn_mv":1.918,"attn":1.063,"ffn":2.510,"ple":0.784,"head":2.745,"att_rope_store":0.152,"att_scores":0.275,"att_softmax":0.226,"att_v":0.397},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":7.134,"elem":0.207,"head_select":0.000,"sparse_book":0.115,"att_warm":0.000},"head_rows_per_tok":4096.0}
+ENG {"label":"pie2warm","test":"speed","rep":0,"tokens":48,"ms_per_tok":7.625,"stage_ms_per_tok":{"input":0.239,"attn_mv":1.920,"attn":0.592,"ffn":2.520,"ple":0.785,"head":0.927,"att_rope_store":0.133,"att_scores":0.117,"att_softmax":0.220,"att_v":0.112},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":5.068,"elem":0.207,"head_select":0.263,"sparse_book":0.116,"att_warm":0.639},"head_rows_per_tok":627.1}
+ENG {"label":"pie2warm","test":"speed","rep":1,"tokens":48,"ms_per_tok":7.626,"stage_ms_per_tok":{"input":0.240,"attn_mv":1.921,"attn":0.593,"ffn":2.519,"ple":0.785,"head":0.927,"att_rope_store":0.133,"att_scores":0.117,"att_softmax":0.220,"att_v":0.112},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":5.069,"elem":0.207,"head_select":0.263,"sparse_book":0.116,"att_warm":0.639},"head_rows_per_tok":627.1}
+ENG {"label":"pie2warm","test":"speed","rep":2,"tokens":48,"ms_per_tok":7.626,"stage_ms_per_tok":{"input":0.240,"attn_mv":1.921,"attn":0.592,"ffn":2.519,"ple":0.785,"head":0.927,"att_rope_store":0.133,"att_scores":0.117,"att_softmax":0.220,"att_v":0.112},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":5.069,"elem":0.207,"head_select":0.263,"sparse_book":0.116,"att_warm":0.639},"head_rows_per_tok":627.1}
+ENG {"label":"pie2warm","test":"eval","targets":510,"nll":1.876600,"nll_sum_bits":"446f443b","argmax_digest":"b822239d","screen_budget":0.150,"screen_rows":626.1,"screen_top1_agree":0.9961,"screen_read_mismatch":0,"stage_ms_per_tok":{"input":0.246,"attn_mv":1.927,"attn":1.489,"ffn":2.534,"ple":0.785,"head":2.746,"att_rope_store":0.132,"att_scores":0.387,"att_softmax":0.718,"att_v":0.241},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":7.859,"elem":0.207,"head_select":0.316,"sparse_book":0.116,"att_warm":1.860},"head_rows_per_tok":4096.0}
+ENG {"label":"pie1","test":"gen","prompt":0,"ids":[339,364,259,346,614,370,620,14,405,502,266,324,329,336,620,267,531,491,376,14,528,327,12,392,505,259,346,614,314,336,705,14,339,283,378,376,14,199,664,407,266,538,578,283,744,263,614,14],"tok_digest":"bb9ab37d","logit_digest":"f2205fa0","prefill_ms":93.88,"ms_per_tok":10.659,"stage_ms_per_tok":{"input":0.355,"attn_mv":2.792,"attn":1.619,"ffn":3.681,"ple":1.033,"head":1.177,"att_rope_store":0.267,"att_scores":0.384,"att_softmax":0.465,"att_v":0.491},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":7.715,"elem":0.207,"head_select":0.263,"sparse_book":0.116,"att_warm":0.000},"head_rows_per_tok":627.1}
+ENG {"label":"pie1","test":"gen","prompt":1,"ids":[527,266,324,329,342,478,14,316,529,1785,309,267,1122,309,14,316,529,1785,309,267,1122,309,14,316,283,378,376,14,199,383,327,12,415,382,259,346,495,14,316,407,266,893,309,14,316,1344,366,263],"tok_digest":"d822d6d3","logit_digest":"0dcff654","prefill_ms":58.13,"ms_per_tok":10.521,"stage_ms_per_tok":{"input":0.354,"attn_mv":2.791,"attn":1.479,"ffn":3.694,"ple":1.034,"head":1.168,"att_rope_store":0.267,"att_scores":0.339,"att_softmax":0.408,"att_v":0.452},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":7.721,"elem":0.207,"head_select":0.257,"sparse_book":0.118,"att_warm":0.000},"head_rows_per_tok":625.8}
+ENG {"label":"pie1","test":"gen","prompt":2,"ids":[312,406,1928,267,1928,14,199,383,327,12,259,391,475,402,405,550,266,263,524,14,339,382,263,812,267,407,266,324,14,405,325,12,317,1101,12,338,739,405,14,1205,349,369,266,324,329,518,477,285],"tok_digest":"89f48832","logit_digest":"87358520","prefill_ms":72.82,"ms_per_tok":10.555,"stage_ms_per_tok":{"input":0.355,"attn_mv":2.792,"attn":1.535,"ffn":3.665,"ple":1.033,"head":1.175,"att_rope_store":0.267,"att_scores":0.357,"att_softmax":0.431,"att_v":0.467},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":7.698,"elem":0.207,"head_select":0.262,"sparse_book":0.115,"att_warm":0.000},"head_rows_per_tok":625.0}
+ENG {"label":"pie1","test":"gen","prompt":3,"ids":[346,614,14,285,614,283,378,346,267,364,661,1288,14,285,464,407,266,324,329,263,614,14,199,411,464,653,266,573,263,614,314,263,614,12,409,309,283,423,1560,14,285,614,1060,604,267,1553,14,285],"tok_digest":"6aca4255","logit_digest":"6379de38","prefill_ms":58.29,"ms_per_tok":10.454,"stage_ms_per_tok":{"input":0.355,"attn_mv":2.792,"attn":1.478,"ffn":3.622,"ple":1.034,"head":1.172,"att_rope_store":0.267,"att_scores":0.339,"att_softmax":0.408,"att_v":0.452},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":7.657,"elem":0.207,"head_select":0.260,"sparse_book":0.113,"att_warm":0.000},"head_rows_per_tok":626.0}
+ENG {"label":"pie1","test":"gen","prompt":4,"ids":[736,12,719,1,338,498,259,1252,386,349,397,199,843,563,267,325,12,317,736,12,719,14,338,865,349,423,14,539,349,498,266,322,846,329,626,620,14,616,498,266,322,846,267,2653,519,14,616,498],"tok_digest":"8e8aa136","logit_digest":"a4f0bdb3","prefill_ms":30.87,"ms_per_tok":10.431,"stage_ms_per_tok":{"input":0.355,"attn_mv":2.791,"attn":1.366,"ffn":3.712,"ple":1.033,"head":1.174,"att_rope_store":0.267,"att_scores":0.304,"att_softmax":0.362,"att_v":0.420},"work_ms_per_tok":{"prep":0.376,"norm":0.255,"matvec":7.741,"elem":0.206,"head_select":0.260,"sparse_book":0.117,"att_warm":0.000},"head_rows_per_tok":626.5}
+ENG {"label":"pie1","test":"speed","rep":0,"tokens":48,"ms_per_tok":10.659,"stage_ms_per_tok":{"input":0.354,"attn_mv":2.792,"attn":1.620,"ffn":3.682,"ple":1.034,"head":1.177,"att_rope_store":0.267,"att_scores":0.384,"att_softmax":0.465,"att_v":0.491},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":7.715,"elem":0.206,"head_select":0.263,"sparse_book":0.116,"att_warm":0.000},"head_rows_per_tok":627.1}
+ENG {"label":"pie1","test":"speed","rep":1,"tokens":48,"ms_per_tok":10.659,"stage_ms_per_tok":{"input":0.355,"attn_mv":2.791,"attn":1.619,"ffn":3.682,"ple":1.033,"head":1.177,"att_rope_store":0.267,"att_scores":0.384,"att_softmax":0.465,"att_v":0.491},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":7.715,"elem":0.206,"head_select":0.263,"sparse_book":0.116,"att_warm":0.000},"head_rows_per_tok":627.1}
+ENG {"label":"pie1","test":"batch","tokens":64,"runs":[{"batch":1,"ms_per_tok":10.514,"last_logits_digest":"5aaf2874"},{"batch":2,"ms_per_tok":8.999,"last_logits_digest":"5aaf2874"},{"batch":4,"ms_per_tok":8.224,"last_logits_digest":"5aaf2874"},{"batch":8,"ms_per_tok":7.861,"last_logits_digest":"5aaf2874"},{"batch":16,"ms_per_tok":7.696,"last_logits_digest":"5aaf2874"}]}
+ENG {"label":"pie1","test":"eval","targets":510,"nll":1.876600,"nll_sum_bits":"446f443b","argmax_digest":"b822239d","screen_budget":0.150,"screen_rows":626.1,"screen_top1_agree":0.9961,"screen_read_mismatch":0,"stage_ms_per_tok":{"input":0.355,"attn_mv":2.795,"attn":4.051,"ffn":3.693,"ple":1.034,"head":4.055,"att_rope_store":0.273,"att_scores":1.211,"att_softmax":1.507,"att_v":1.047},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":11.791,"elem":0.207,"head_select":0.316,"sparse_book":0.116,"att_warm":0.000},"head_rows_per_tok":4096.0}
+ENG {"label":"ref1","test":"gen","prompt":0,"ids":[339,364,259,346,614,370,620,14,405,502,266,324,329,336,620,267,531,491,376,14,528,327,12,392,505,259,346,614,314,336,705,14,339,283,378,376,14,199,664,407,266,538,578,283,744,263,614,14],"tok_digest":"bb9ab37d","logit_digest":"f2205fa0","prefill_ms":642.69,"ms_per_tok":58.025,"stage_ms_per_tok":{"input":2.542,"attn_mv":20.178,"attn":3.499,"ffn":20.226,"ple":5.419,"head":6.160,"att_rope_store":0.267,"att_scores":1.249,"att_softmax":0.465,"att_v":1.505},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":53.202,"elem":0.206,"head_select":0.263,"sparse_book":0.116,"att_warm":0.000},"head_rows_per_tok":627.1}
+ENG {"label":"ref1","test":"gen","prompt":1,"ids":[527,266,324,329,342,478,14,316,529,1785,309,267,1122,309,14,316,529,1785,309,267,1122,309,14,316,283,378,376,14,199,383,327,12,415,382,259,346,495,14,316,407,266,893,309,14,316,1344,366,263],"tok_digest":"d822d6d3","logit_digest":"0dcff654","prefill_ms":395.77,"ms_per_tok":57.856,"stage_ms_per_tok":{"input":2.542,"attn_mv":20.178,"attn":3.131,"ffn":20.442,"ple":5.419,"head":6.143,"att_rope_store":0.267,"att_scores":1.090,"att_softmax":0.408,"att_v":1.353},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":53.404,"elem":0.206,"head_select":0.257,"sparse_book":0.117,"att_warm":0.000},"head_rows_per_tok":625.8}
+ENG {"label":"ref1","test":"gen","prompt":2,"ids":[312,406,1928,267,1928,14,199,383,327,12,259,391,475,402,405,550,266,263,524,14,339,382,263,812,267,407,266,324,14,405,325,12,317,1101,12,338,739,405,14,1205,349,369,266,324,329,518,477,285],"tok_digest":"89f48832","logit_digest":"87358520","prefill_ms":498.86,"ms_per_tok":57.704,"stage_ms_per_tok":{"input":2.542,"attn_mv":20.177,"attn":3.279,"ffn":20.140,"ple":5.420,"head":6.147,"att_rope_store":0.267,"att_scores":1.155,"att_softmax":0.431,"att_v":1.414},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":53.103,"elem":0.206,"head_select":0.261,"sparse_book":0.115,"att_warm":0.000},"head_rows_per_tok":625.0}
+ENG {"label":"ref1","test":"gen","prompt":3,"ids":[346,614,14,285,614,283,378,346,267,364,661,1288,14,285,464,407,266,324,329,263,614,14,199,411,464,653,266,573,263,614,314,263,614,12,409,309,283,423,1560,14,285,614,1060,604,267,1553,14,285],"tok_digest":"6aca4255","logit_digest":"6379de38","prefill_ms":397.10,"ms_per_tok":57.312,"stage_ms_per_tok":{"input":2.542,"attn_mv":20.177,"attn":3.131,"ffn":19.893,"ple":5.419,"head":6.150,"att_rope_store":0.267,"att_scores":1.090,"att_softmax":0.408,"att_v":1.353},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":52.863,"elem":0.207,"head_select":0.260,"sparse_book":0.113,"att_warm":0.000},"head_rows_per_tok":626.0}
+ENG {"label":"ref1","test":"gen","prompt":4,"ids":[736,12,719,1,338,498,259,1252,386,349,397,199,843,563,267,325,12,317,736,12,719,14,338,865,349,423,14,539,349,498,266,322,846,329,626,620,14,616,498,266,322,846,267,2653,519,14,616,498],"tok_digest":"8e8aa136","logit_digest":"a4f0bdb3","prefill_ms":206.27,"ms_per_tok":57.604,"stage_ms_per_tok":{"input":2.542,"attn_mv":20.178,"attn":2.837,"ffn":20.474,"ple":5.418,"head":6.154,"att_rope_store":0.267,"att_scores":0.963,"att_softmax":0.362,"att_v":1.233},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":53.442,"elem":0.206,"head_select":0.260,"sparse_book":0.117,"att_warm":0.000},"head_rows_per_tok":626.5}
+ENG {"label":"ref1","test":"batch","tokens":64,"runs":[{"batch":1,"ms_per_tok":58.001,"last_logits_digest":"5aaf2874"},{"batch":2,"ms_per_tok":54.107,"last_logits_digest":"5aaf2874"},{"batch":4,"ms_per_tok":52.166,"last_logits_digest":"5aaf2874"},{"batch":8,"ms_per_tok":51.254,"last_logits_digest":"5aaf2874"},{"batch":16,"ms_per_tok":50.852,"last_logits_digest":"5aaf2874"}]}
+ENG {"label":"ref1","test":"eval","targets":510,"nll":1.876600,"nll_sum_bits":"446f443b","argmax_digest":"b822239d","screen_budget":0.150,"screen_rows":626.1,"screen_top1_agree":0.9961,"screen_read_mismatch":0,"stage_ms_per_tok":{"input":2.542,"attn_mv":20.178,"attn":10.029,"ffn":20.303,"ple":5.419,"head":27.180,"att_rope_store":0.273,"att_scores":4.149,"att_softmax":1.507,"att_v":4.088},"work_ms_per_tok":{"prep":0.375,"norm":0.255,"matvec":80.444,"elem":0.207,"head_select":0.316,"sparse_book":0.116,"att_warm":0.000},"head_rows_per_tok":4096.0}
+ENG {"test":"done"}

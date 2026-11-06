@@ -1,0 +1,13 @@
+ENG {"test":"heapcheck","after":"llm_new","ok":1}
+ENG {"test":"micro","cyc_exp":150.8,"cyc_recip":101.0,"cyc_par2_empty":85.5,"cyc_q4g_4KB_sram":4828.0,"cyc_q4g_4KB_psram_cold":12670.6,"cyc_psram_random_load":167.2}
+Guru Meditation Error: Core  0 panic'ed (LoadProhibited). Exception was unhandled.
+Core  0 register dump:
+PC      : 0x4201d9d0  PS      : 0x00060f33  A0      : 0x8201d9ee  A1      : 0x3fc9bfe0
+A2      : 0x3fc9aaa4  A3      : 0xc1caaa10  A4      : 0x3fc9c000  A5      : 0x4201d7ac
+A6      : 0xfffffffc  A7      : 0xc1caaa14  A8      : 0x8200edf0  A9      : 0x8200edf0
+A10     : 0x00000001  A11     : 0x00000000  A12     : 0x00000001  A13     : 0x3fc9c000
+A14     : 0x00000000  A15     : 0x00000000  SAR     : 0x00000001  EXCCAUSE: 0x0000001c
+EXCVADDR: 0xc1caaa14  LBEG    : 0x40054bf0  LEND    : 0x40054c0f  LCOUNT  : 0x00000000
+Backtrace: 0x4201d9cd:0x3fc9bfe0 0x4201d9eb:0x3fc9c000 0x4201d67b:0x3fc9c030 0x42002c12:0x3fc9c050 0x42009b2c:0x3fc9c070 0x4201d54c:0x3fc9cc30
+ELF file SHA256: ba3c16ce2
+Rebooting...

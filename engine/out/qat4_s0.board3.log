@@ -1,0 +1,101 @@
+ESP-ROM:esp32s3-20210327
+Build:Mar 27 2021
+rst:0x1 (POWERON),boot:0x8 (SPI_FAST_FLASH_BOOT)
+SPIWP:0xee
+mode:DIO, clock div:1
+load:0x3fce2820,len:0x1668
+load:0x403c8700,len:0xec0
+load:0x403cb700,len:0x3178
+entry 0x403c894c
+I (24) boot: ESP-IDF v5.5.5 2nd stage bootloader
+I (25) boot: compile time Sep 25 2026 19:08:03
+I (25) boot: Multicore bootloader
+I (25) boot: chip revision: v0.2
+I (28) boot: efuse block revision: v1.3
+I (31) qio_mode: Enabling default flash chip QIO
+I (36) boot.esp32s3: Boot SPI Speed : 80MHz
+I (40) boot.esp32s3: SPI Mode       : QIO
+I (43) boot.esp32s3: SPI Flash Size : 16MB
+I (47) boot: Enabling RNG early entropy source...
+I (52) boot: Partition Table:
+I (54) boot: ## Label            Usage          Type ST Offset   Length
+I (61) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+I (67) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+I (74) boot:  2 factory          factory app      00 00 00010000 00200000
+I (80) boot:  3 model            Unknown data     01 40 00210000 00800000
+I (87) boot: End of partition table
+I (90) esp_image: segment 0: paddr=00010020 vaddr=3c020020 size=0a614h ( 42516) map
+I (104) esp_image: segment 1: paddr=0001a63c vaddr=3fc96800 size=03258h ( 12888) load
+I (107) esp_image: segment 2: paddr=0001d89c vaddr=40378000 size=0277ch ( 10108) load
+I (114) esp_image: segment 3: paddr=00020020 vaddr=42000020 size=1c430h (115760) map
+I (138) esp_image: segment 4: paddr=0003c458 vaddr=4037a77c size=0bfa0h ( 49056) load
+I (148) esp_image: segment 5: paddr=00048400 vaddr=50000000 size=00020h (    32) load
+I (154) boot: Loaded app from partition at offset 0x10000
+I (154) boot: Disabling RNG early entropy source...
+I (166) octal_psram: vendor id    : 0x0d (AP)
+I (166) octal_psram: dev id       : 0x02 (generation 3)
+I (166) octal_psram: density      : 0x03 (64 Mbit)
+I (168) octal_psram: good-die     : 0x01 (Pass)
+I (172) octal_psram: Latency      : 0x01 (Fixed)
+I (176) octal_psram: VCC          : 0x01 (3V)
+I (181) octal_psram: SRF          : 0x01 (Fast Refresh)
+I (185) octal_psram: BurstType    : 0x01 (Hybrid Wrap)
+I (190) octal_psram: BurstLen     : 0x01 (32 Byte)
+I (195) octal_psram: Readlatency  : 0x02 (10 cycles@Fixed)
+I (200) octal_psram: DriveStrength: 0x00 (1/1)
+I (204) MSPI Timing: Enter psram timing tuning
+I (209) esp_psram: Found 8MB PSRAM device
+I (212) esp_psram: Speed: 80MHz
+I (215) cpu_start: Multicore app
+I (503) esp_psram: SPI SRAM memory test OK
+I (512) cpu_start: GPIO 44 and 43 are used as console UART I/O pins
+I (512) cpu_start: Pro cpu start user code
+I (512) cpu_start: cpu freq: 240000000 Hz
+I (514) app_init: Application information:
+I (518) app_init: Project name:     mculm_engine
+I (522) app_init: App version:      1
+I (525) app_init: Compile time:     Sep 25 2026 19:07:27
+I (531) app_init: ELF file SHA256:  dfaf01235...
+I (535) app_init: ESP-IDF:          v5.5.5
+I (539) efuse_init: Min chip rev:     v0.0
+I (542) efuse_init: Max chip rev:     v0.99
+I (546) efuse_init: Chip rev:         v0.2
+I (550) heap_init: Initializing. RAM available for dynamic allocation:
+I (557) heap_init: At 3FC9A3B0 len 0004F360 (316 KiB): RAM
+I (562) heap_init: At 3FCE9710 len 00005724 (21 KiB): RAM
+I (567) heap_init: At 600FE000 len 00001FE8 (7 KiB): RTCRAM
+I (572) esp_psram: Adding pool of 8192K of PSRAM memory to heap allocator
+I (579) spi_flash: detected chip: boya
+I (582) spi_flash: flash io: qio
+I (585) sleep_gpio: Configure to isolate all GPIO pins in sleep state
+I (591) sleep_gpio: Enable automatic switching of GPIO sleep configuration
+I (598) main_task: Started on CPU0
+I (618) esp_psram: Reserving pool of 32K of internal memory for DMA/internal allocations
+I (618) main_task: Calling app_main()
+ENG {"label":"board","test":"config","vocab":4096,"d":128,"layers":6,"heads":4,"ffn":384,"ple":0,"act":0,"ctx":256,"pack_bytes":1093184,"load_ms":49.6,"weights_sram":187904,"weights_psram":832512,"flash_inplace":32768,"sram_free":80167,"psram_free":7111068}
+ENG {"label":"pie2","test":"gen","prompt":0,"ids":[339,364,259,346,12,670,478,14,405,502,266,324,329,336,478,587,327,14,528,327,12,392,382,259,346,12,670,478,14,339,407,266,324,329,309,14,199,664,427,266,336,358,12,415,14,415,325,12],"tok_digest":"398d877e","logit_digest":"2888f04f","prefill_ms":207.85,"ms_per_tok":16.553,"stage_ms_per_tok":{"input":0.007,"attn_mv":2.630,"attn":1.605,"ffn":8.773,"ple":0.000,"head":3.536}}
+ENG {"label":"pie2","test":"gen","prompt":1,"ids":[502,266,324,329,309,433,327,14,528,327,12,286,382,259,346,12,670,478,314,263,524,14,316,407,266,324,329,309,14,199,737,427,266,263,524,329,342,387,14,316,382,259,346,495,329,259,1096,314],"tok_digest":"144a3bdc","logit_digest":"5f5316cf","prefill_ms":127.10,"ms_per_tok":16.451,"stage_ms_per_tok":{"input":0.007,"attn_mv":2.629,"attn":1.504,"ffn":8.775,"ple":0.000,"head":3.536}}
+ENG {"label":"pie2","test":"gen","prompt":2,"ids":[285,1113,406,1928,267,1928,14,285,1113,406,1928,14,285,1113,406,1928,14,285,1113,406,1928,14,285,1113,406,1928,14,285,1113,1737,259,376,1289,14,285,1113,1737,259,376,1289,14,285,1113,1737,259,376,1289,14],"tok_digest":"51ad9a12","logit_digest":"91bf13cf","prefill_ms":159.07,"ms_per_tok":16.491,"stage_ms_per_tok":{"input":0.007,"attn_mv":2.629,"attn":1.544,"ffn":8.774,"ple":0.000,"head":3.536}}
+ENG {"label":"pie2","test":"gen","prompt":3,"ids":[346,614,14,285,464,407,266,324,329,263,614,14,285,464,283,378,376,14,199,411,464,610,263,614,266,263,464,14,285,464,283,378,376,14,285,464,267,263,464,473,329,263,614,433,327,14,312,364],"tok_digest":"a430b257","logit_digest":"54e7caba","prefill_ms":127.09,"ms_per_tok":16.451,"stage_ms_per_tok":{"input":0.007,"attn_mv":2.628,"attn":1.504,"ffn":8.774,"ple":0.000,"head":3.536}}
+ENG {"label":"pie2","test":"gen","prompt":4,"ids":[894,384,479,266,263,524,267,324,397,199,645,267,342,387,427,266,263,524,14,312,382,259,346,495,329,259,1096,14,341,325,12,317,843,12,467,363,324,329,263,1096,477,801,387,325,12,317,736,12],"tok_digest":"532c92dd","logit_digest":"9e926435","prefill_ms":63.40,"ms_per_tok":16.370,"stage_ms_per_tok":{"input":0.007,"attn_mv":2.628,"attn":1.422,"ffn":8.777,"ple":0.000,"head":3.536}}
+ENG {"label":"pie2","test":"speed","rep":0,"tokens":48,"ms_per_tok":16.552,"stage_ms_per_tok":{"input":0.007,"attn_mv":2.630,"attn":1.605,"ffn":8.773,"ple":0.000,"head":3.536}}
+ENG {"label":"pie2","test":"speed","rep":1,"tokens":48,"ms_per_tok":16.553,"stage_ms_per_tok":{"input":0.007,"attn_mv":2.630,"attn":1.606,"ffn":8.773,"ple":0.000,"head":3.536}}
+ENG {"label":"pie2","test":"speed","rep":2,"tokens":48,"ms_per_tok":16.552,"stage_ms_per_tok":{"input":0.007,"attn_mv":2.630,"attn":1.606,"ffn":8.773,"ple":0.000,"head":3.536}}
+ENG {"label":"pie2","test":"speed","rep":3,"tokens":48,"ms_per_tok":16.551,"stage_ms_per_tok":{"input":0.007,"attn_mv":2.630,"attn":1.606,"ffn":8.772,"ple":0.000,"head":3.536}}
+ENG {"label":"pie2","test":"speed","rep":4,"tokens":48,"ms_per_tok":16.553,"stage_ms_per_tok":{"input":0.007,"attn_mv":2.630,"attn":1.605,"ffn":8.773,"ple":0.000,"head":3.536}}
+ENG {"label":"pie2","test":"eval","targets":510,"nll":1.813455,"nll_sum_bits":"4467372e","argmax_digest":"ec880e61"}
+ENG {"label":"pie1","test":"gen","prompt":0,"ids":[339,364,259,346,12,670,478,14,405,502,266,324,329,336,478,587,327,14,528,327,12,392,382,259,346,12,670,478,14,339,407,266,324,329,309,14,199,664,427,266,336,358,12,415,14,415,325,12],"tok_digest":"398d877e","logit_digest":"2888f04f","prefill_ms":259.13,"ms_per_tok":20.912,"stage_ms_per_tok":{"input":0.007,"attn_mv":3.475,"attn":2.373,"ffn":10.443,"ple":0.000,"head":4.614}}
+ENG {"label":"pie1","test":"gen","prompt":1,"ids":[502,266,324,329,309,433,327,14,528,327,12,286,382,259,346,12,670,478,314,263,524,14,316,407,266,324,329,309,14,199,737,427,266,263,524,329,342,387,14,316,382,259,346,495,329,259,1096,314],"tok_digest":"144a3bdc","logit_digest":"5f5316cf","prefill_ms":158.81,"ms_per_tok":20.751,"stage_ms_per_tok":{"input":0.007,"attn_mv":3.474,"attn":2.210,"ffn":10.445,"ple":0.000,"head":4.614}}
+ENG {"label":"pie1","test":"gen","prompt":2,"ids":[285,1113,406,1928,267,1928,14,285,1113,406,1928,14,285,1113,406,1928,14,285,1113,406,1928,14,285,1113,406,1928,14,285,1113,1737,259,376,1289,14,285,1113,1737,259,376,1289,14,285,1113,1737,259,376,1289,14],"tok_digest":"51ad9a12","logit_digest":"91bf13cf","prefill_ms":198.75,"ms_per_tok":20.812,"stage_ms_per_tok":{"input":0.007,"attn_mv":3.474,"attn":2.276,"ffn":10.443,"ple":0.000,"head":4.611}}
+ENG {"label":"pie1","test":"gen","prompt":3,"ids":[346,614,14,285,464,407,266,324,329,263,614,14,285,464,283,378,376,14,199,411,464,610,263,614,266,263,464,14,285,464,283,378,376,14,285,464,267,263,464,473,329,263,614,433,327,14,312,364],"tok_digest":"a430b257","logit_digest":"54e7caba","prefill_ms":158.97,"ms_per_tok":20.748,"stage_ms_per_tok":{"input":0.007,"attn_mv":3.474,"attn":2.211,"ffn":10.444,"ple":0.000,"head":4.612}}
+ENG {"label":"pie1","test":"gen","prompt":4,"ids":[894,384,479,266,263,524,267,324,397,199,645,267,342,387,427,266,263,524,14,312,382,259,346,495,329,259,1096,14,341,325,12,317,843,12,467,363,324,329,263,1096,477,801,387,325,12,317,736,12],"tok_digest":"532c92dd","logit_digest":"9e926435","prefill_ms":79.11,"ms_per_tok":20.624,"stage_ms_per_tok":{"input":0.007,"attn_mv":3.471,"attn":2.081,"ffn":10.447,"ple":0.000,"head":4.617}}
+ENG {"label":"pie1","test":"speed","rep":0,"tokens":48,"ms_per_tok":20.912,"stage_ms_per_tok":{"input":0.007,"attn_mv":3.476,"attn":2.373,"ffn":10.442,"ple":0.000,"head":4.613}}
+ENG {"label":"pie1","test":"speed","rep":1,"tokens":48,"ms_per_tok":20.912,"stage_ms_per_tok":{"input":0.007,"attn_mv":3.475,"attn":2.373,"ffn":10.442,"ple":0.000,"head":4.614}}
+ENG {"label":"pie1","test":"eval","targets":510,"nll":1.813455,"nll_sum_bits":"4467372e","argmax_digest":"ec880e61"}
+ENG {"label":"ref1","test":"gen","prompt":0,"ids":[339,364,259,346,12,670,478,14,405,502,266,324,329,336,478,587,327,14,528,327,12,392,382,259,346,12,670,478,14,339,407,266,324,329,309,14,199,664,427,266,336,358,12,415,14,415,325,12],"tok_digest":"398d877e","logit_digest":"2888f04f","prefill_ms":1126.49,"ms_per_tok":89.013,"stage_ms_per_tok":{"input":0.007,"attn_mv":18.058,"attn":4.300,"ffn":42.776,"ple":0.000,"head":23.872}}
+ENG {"label":"ref1","test":"gen","prompt":1,"ids":[502,266,324,329,309,433,327,14,528,327,12,286,382,259,346,12,670,478,314,263,524,14,316,407,266,324,329,309,14,199,737,427,266,263,524,329,342,387,14,316,382,259,346,495,329,259,1096,314],"tok_digest":"144a3bdc","logit_digest":"5f5316cf","prefill_ms":692.16,"ms_per_tok":88.621,"stage_ms_per_tok":{"input":0.007,"attn_mv":18.056,"attn":3.905,"ffn":42.778,"ple":0.000,"head":23.874}}
+ENG {"label":"ref1","test":"gen","prompt":2,"ids":[285,1113,406,1928,267,1928,14,285,1113,406,1928,14,285,1113,406,1928,14,285,1113,406,1928,14,285,1113,406,1928,14,285,1113,1737,259,376,1289,14,285,1113,1737,259,376,1289,14,285,1113,1737,259,376,1289,14],"tok_digest":"51ad9a12","logit_digest":"91bf13cf","prefill_ms":865.74,"ms_per_tok":88.780,"stage_ms_per_tok":{"input":0.007,"attn_mv":18.058,"attn":4.063,"ffn":42.777,"ple":0.000,"head":23.875}}
+ENG {"label":"ref1","test":"gen","prompt":3,"ids":[346,614,14,285,464,407,266,324,329,263,614,14,285,464,283,378,376,14,199,411,464,610,263,614,266,263,464,14,285,464,283,378,376,14,285,464,267,263,464,473,329,263,614,433,327,14,312,364],"tok_digest":"a430b257","logit_digest":"54e7caba","prefill_ms":692.14,"ms_per_tok":88.619,"stage_ms_per_tok":{"input":0.007,"attn_mv":18.054,"attn":3.905,"ffn":42.780,"ple":0.000,"head":23.873}}
+ENG {"label":"ref1","test":"gen","prompt":4,"ids":[894,384,479,266,263,524,267,324,397,199,645,267,342,387,427,266,263,524,14,312,382,259,346,495,329,259,1096,14,341,325,12,317,843,12,467,363,324,329,263,1096,477,801,387,325,12,317,736,12],"tok_digest":"532c92dd","logit_digest":"9e926435","prefill_ms":345.65,"ms_per_tok":88.306,"stage_ms_per_tok":{"input":0.007,"attn_mv":18.058,"attn":3.590,"ffn":42.776,"ple":0.000,"head":23.873}}
+ENG {"label":"ref1","test":"eval","targets":510,"nll":1.813455,"nll_sum_bits":"4467372e","argmax_digest":"ec880e61"}
+ENG {"test":"done"}
