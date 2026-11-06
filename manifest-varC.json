@@ -1,8 +1,8 @@
 {
-  "name": "bytes-per-token demo, varC 8.6M",
+  "name": "bytes-per-token demo, varC 8.6M (70M training tokens)",
   "version": "0.1.0",
   "new_install_prompt_erase": true,
   "builds": [
-    { "chipFamily": "ESP32-S3", "parts": [ { "path": "fw/bpt-demo-varC_s0.bin", "offset": 0 } ] }
+    { "chipFamily": "ESP32-S3", "parts": [ { "path": "fw/bpt-demo-varC_long_s0.bin", "offset": 0 } ] }
   ]
 }
