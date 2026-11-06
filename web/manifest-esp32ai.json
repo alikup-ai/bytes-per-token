@@ -1,0 +1,8 @@
+{
+  "name": "bytes-per-token demo, esp32-ai 29M model",
+  "version": "0.1.0",
+  "new_install_prompt_erase": true,
+  "builds": [
+    { "chipFamily": "ESP32-S3", "parts": [ { "path": "fw/bpt-demo-esp32ai_ts.bin", "offset": 0 } ] }
+  ]
+}

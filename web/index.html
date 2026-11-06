@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ESP32-S3 Writes</title>
+<meta name="description" content="Flash a language model to an ESP32-S3 from your browser and watch it write at ~87 tokens/s.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<script type="module" src="https://unpkg.com/esp-web-tools@10.4.0/dist/web/install-button.js?module"></script>
+<style>
+:root {
+  color-scheme: light;
+  --paper: #f5f6f3; --card: #ffffff; --ink: #141c18; --ink-2: #4d5852; --ink-3: #7c8680; --line: #d8ddd8;
+  --accent: #2a78d6; --accent-ink: #ffffff; --accent-soft: #e3eefb; --good: #1a7f4b; --warn: #a15c00;
+  --bar: #2a78d6; --prompt: #7c8680;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --paper: #121614; --card: #1a1f1c; --ink: #edf1ee; --ink-2: #b5beb8; --ink-3: #87918b;
+    --line: #2d3531; --accent: #3987e5; --accent-soft: #1d2d42; --good: #4fbf85; --warn: #e0a24a; --bar: #3987e5; --prompt: #87918b;
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #121614; --card: #1a1f1c; --ink: #edf1ee; --ink-2: #b5beb8; --ink-3: #87918b;
+  --line: #2d3531; --accent: #3987e5; --accent-soft: #1d2d42; --good: #4fbf85; --warn: #e0a24a; --bar: #3987e5; --prompt: #87918b;
+}
+* { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 15px/1.55 var(--body); }
+a { color: var(--accent); }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 40px; display: grid; gap: 18px; }
+header { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; justify-content: space-between; }
+h1 { font: 600 28px/1.1 var(--display); margin: 0; letter-spacing: .01em; text-wrap: balance; }
+h1 small { display: block; font: 400 14px/1.4 var(--body); color: var(--ink-2); margin-top: 4px; }
+h2 { font: 600 18px/1.2 var(--display); margin: 0; }
+.conn { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.chip { font: 500 12px/1 var(--mono); padding: 7px 10px; border-radius: 999px; border: 1px solid var(--line); color: var(--ink-2); background: var(--card); }
+.chip.on { border-color: var(--good); color: var(--good); }
+.chip.on::before { content: "● "; }
+button { font: 600 14px/1 var(--body); border-radius: 8px; padding: 11px 16px; border: 1px solid var(--line); background: var(--card); color: var(--ink); cursor: pointer; }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+button:disabled { opacity: .45; cursor: not-allowed; }
+button:focus-visible, textarea:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.flash { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+@media (max-width: 760px) { .flash { grid-template-columns: minmax(0, 1fr); } }
+.fw { display: grid; gap: 8px; align-content: start; }
+.fw p { margin: 0; color: var(--ink-2); font-size: 14px; }
+.grid { display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr); gap: 18px; align-items: start; }
+@media (max-width: 860px) { .grid { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 18px; display: grid; gap: 14px; }
+label, .lbl { font: 600 11px/1.2 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+textarea { width: 100%; min-height: 120px; resize: vertical; font: 16px/1.5 var(--body); color: var(--ink); background: var(--paper); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+.examples { display: flex; flex-wrap: wrap; gap: 6px; }
+.examples button { font: 400 13px/1.2 var(--body); padding: 7px 10px; border-radius: 999px; }
+.row { display: grid; gap: 6px; }
+.row .val { font: 500 13px var(--mono); color: var(--ink-2); }
+.seg { display: flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { flex: 1; border: 0; border-radius: 0; padding: 9px 6px; font-weight: 500; font-size: 13px; }
+.seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent); }
+input[type=range] { width: 100%; accent-color: var(--accent); }
+.actions { display: flex; gap: 10px; }
+.actions button { flex: 1; }
+.stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+@media (max-width: 560px) { .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.stat { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; display: grid; gap: 2px; }
+.stat b { font: 600 30px/1.05 var(--display); font-variant-numeric: tabular-nums; }
+.stat span { font: 12px/1.3 var(--body); color: var(--ink-2); }
+.out { min-height: 280px; font: 19px/1.65 var(--body); white-space: pre-wrap; overflow-wrap: anywhere; }
+.out .p { color: var(--prompt); }
+.cursor { display: inline-block; width: .55em; height: 1.05em; vertical-align: -.15em; background: var(--accent); margin-left: 1px; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .cursor { animation: none; } }
+canvas { width: 100%; height: 70px; display: block; }
+.note { font-size: 13px; color: var(--ink-2); line-height: 1.5; margin: 0; }
+.err { color: var(--warn); font-size: 14px; margin: 0; }
+footer { font: 12px/1.5 var(--mono); color: var(--ink-3); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>A language model on an ESP32-S3
+      <small>An $8 chip, no internet. The board continues your story token by token, in real time. <a href="https://github.com/alikup-ai/bytes-per-token">Source on GitHub</a>.</small></h1>
+  </header>
+
+  <section class="panel" aria-label="Flash">
+    <h2>1. Flash the board (once)</h2>
+    <p class="note">Needs an <b>ESP32-S3 with 16 MB flash and 8 MB octal PSRAM</b> (for example ESP32-S3-DevKitC-1 N16R8), a USB cable and Chrome or Edge on a computer. Flashing erases the board.</p>
+    <div class="flash">
+      <div class="fw">
+        <esp-web-install-button manifest="manifest-varC.json">
+          <button slot="activate" class="primary">Flash: our model, 8.6M (6 MB)</button>
+          <span slot="unsupported">Your browser cannot flash boards. Use Chrome or Edge on a desktop.</span>
+          <span slot="not-allowed">Flashing needs HTTPS.</span>
+        </esp-web-install-button>
+        <p>Designed for bytes per token: 0.63 bits/byte on TinyStories, ~80-95 tokens/s.</p>
+      </div>
+      <div class="fw">
+        <esp-web-install-button manifest="manifest-esp32ai.json">
+          <button slot="activate">Flash: esp32-ai model, 29M (16 MB)</button>
+          <span slot="unsupported"></span>
+          <span slot="not-allowed"></span>
+        </esp-web-install-button>
+        <p>The <a href="https://github.com/slvDev/esp32-ai">slvDev/esp32-ai</a> TinyStories model (MIT) on our engine: ~87 tokens/s vs 10.6 on its own firmware.</p>
+      </div>
+    </div>
+    <p class="note">After flashing, close the flasher window, then press <b>Connect board</b> below.</p>
+  </section>
+
+  <section class="panel" aria-label="Connect">
+    <div class="conn" style="justify-content: space-between">
+      <h2>2. Write with it</h2>
+      <div class="conn">
+        <span class="chip" id="status">Board not connected</span>
+        <button class="primary" id="connect">Connect board</button>
+      </div>
+    </div>
+    <p class="err" id="err" hidden></p>
+  </section>
+
+  <div class="grid">
+    <section class="panel" aria-label="Prompt">
+      <div class="row">
+        <label for="prompt">Start of a story</label>
+        <textarea id="prompt">Once upon a time, a little robot</textarea>
+      </div>
+      <div class="examples" id="examples">
+        <button type="button">Once upon a time, a little robot</button>
+        <button type="button">Tom had a big red ball. He</button>
+        <button type="button">One day, Lily and her dog went to the park.</button>
+        <button type="button">The sun was shining and the birds were singing.</button>
+      </div>
+      <div class="row">
+        <div class="lbl">Style</div>
+        <div class="seg" id="temp" role="group" aria-label="Style">
+          <button type="button" data-t="0" aria-pressed="false">Exact</button>
+          <button type="button" data-t="700" aria-pressed="true">Lively</button>
+          <button type="button" data-t="1000" aria-pressed="false">Bold</button>
+        </div>
+      </div>
+      <div class="row">
+        <label for="len">Length, tokens: <span class="val" id="lenv">120</span></label>
+        <input type="range" id="len" min="20" max="220" step="10" value="120">
+      </div>
+      <div class="actions">
+        <button class="primary" id="go" disabled>Write</button>
+        <button id="stop" disabled>Stop</button>
+      </div>
+      <p class="note">The model was trained on children's stories (TinyStories), so it <b>continues</b> stories; it does not answer questions. Everything runs on the board: the page only turns text into token ids and back.</p>
+    </section>
+
+    <section style="display:grid; gap:14px" aria-label="Board output">
+      <div class="stats">
+        <div class="stat"><b id="tps">—</b><span>tokens per second</span></div>
+        <div class="stat"><b id="ms">—</b><span>ms per token</span></div>
+        <div class="stat"><b id="ntok">0</b><span>tokens written</span></div>
+        <div class="stat"><b id="pf">—</b><span>ms to read the prompt</span></div>
+      </div>
+      <div class="panel">
+        <div class="lbl">Board output</div>
+        <div class="out" id="out" aria-live="polite"><span class="p">Connect the board and press Write.</span></div>
+        <div class="lbl">Time per token, ms</div>
+        <canvas id="spark" width="1200" height="140" aria-label="Time per token"></canvas>
+      </div>
+      <footer id="model">Model: detected when the board connects.</footer>
+    </section>
+  </div>
+</div>
+
+<script src="tokenizers.js"></script>
+<script src="bpe.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+let port = null, reader = null, writer = null, tok = null, info = null;
+let running = false, decode = null, times = [], count = 0, lineBuf = "";
+let temp = 700;
+
+function showErr(msg) { $("err").textContent = msg; $("err").hidden = !msg; }
+
+if (!("serial" in navigator)) {
+  showErr("This browser cannot talk to the board. Open the page in Google Chrome or Microsoft Edge on a computer.");
+  $("connect").disabled = true;
+}
+
+$("examples").addEventListener("click", (e) => { if (e.target.tagName === "BUTTON") $("prompt").value = e.target.textContent; });
+$("temp").addEventListener("click", (e) => {
+  const b = e.target.closest("button"); if (!b) return;
+  temp = +b.dataset.t;
+  for (const x of $("temp").children) x.setAttribute("aria-pressed", x === b ? "true" : "false");
+});
+$("len").addEventListener("input", () => $("lenv").textContent = $("len").value);
+
+async function send(line) { await writer.write(new TextEncoder().encode(line + "\n")); }
+
+$("connect").addEventListener("click", async () => {
+  showErr("");
+  if (port) {                                   // reconnect: release the old port first
+    try { await reader.cancel(); } catch (e) {}
+    try { writer.releaseLock(); await port.close(); } catch (e) {}
+    port = null; info = null;
+  }
+  try {
+    port = await navigator.serial.requestPort();
+    await port.open({ baudRate: 115200, bufferSize: 65536 });
+    try { await port.setSignals({ dataTerminalReady: false, requestToSend: false }); } catch (e) {}
+    writer = port.writable.getWriter();
+    readLoop();
+    $("status").textContent = "Connecting…";
+    setTimeout(() => send("I"), 400);
+    setTimeout(() => { if (!info) send("I"); }, 2500);
+    setTimeout(() => { if (!info) showErr("The board does not answer. Was it flashed with step 1? Try pressing RESET on the board, then Connect again."); }, 6000);
+  } catch (e) {
+    showErr("Could not open the port: " + e.message + ". Check the cable and that no other program (or the flasher window) holds the port.");
+  }
+});
+
+async function readLoop() {
+  const dec = new TextDecoder();
+  reader = port.readable.getReader();
+  try {
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      lineBuf += dec.decode(value, { stream: true });
+      let i;
+      while ((i = lineBuf.indexOf("\n")) >= 0) {
+        const line = lineBuf.slice(0, i).trim();
+        lineBuf = lineBuf.slice(i + 1);
+        if (line) onLine(line);
+      }
+    }
+  } catch (e) {
+    showErr("Lost the connection to the board: " + e.message);
+    $("status").className = "chip"; $("status").textContent = "Board disconnected";
+    $("go").disabled = true; $("stop").disabled = true;
+  }
+}
+
+function onLine(line) {
+  if (line.startsWith("READY ")) {
+    info = JSON.parse(line.slice(6));
+    const spec = window.TOKENIZERS[info.vocab];
+    if (!spec) { showErr("Unknown model on the board (vocabulary " + info.vocab + ")."); return; }
+    tok = makeTokenizer(spec);
+    showErr("");
+    $("status").className = "chip on";
+    $("status").textContent = "Board connected";
+    $("model").textContent = `Model: ${tok.label}. Width ${info.d}, ${info.layers} layers, vocabulary ${info.vout}, context ${info.ctx} tokens. PSRAM ${info.psram_mhz} MHz, ${info.head_budget >= 1 ? 'full output layer' : `two-stage output layer (${Math.round(info.head_budget * 100)}% of rows)`}.`;
+    $("go").disabled = running;
+    $("connect").textContent = "Reconnect";
+    return;
+  }
+  if (line.startsWith("P ")) { $("pf").textContent = (+line.split(" ")[1]).toFixed(0); return; }
+  if (line.startsWith("T ")) {
+    const [, id, us] = line.split(" ").map(Number);
+    if (+us > 0) { times.push(us / 1000); drawSpark(); updateSpeed(); }
+    count++; $("ntok").textContent = count;
+    const text = decode(id);
+    if (text) {
+      const g = $("gen"), c = g.parentNode.querySelector(".cursor");
+      g.append(document.createTextNode(text));
+      if (c) g.after(c);
+    }
+    return;
+  }
+  if (line.startsWith("E ")) {
+    const ms = +line.split(" ")[2];
+    if (ms > 0) { $("ms").textContent = ms.toFixed(1); $("tps").textContent = (1000 / ms).toFixed(0); }
+    finish();
+    return;
+  }
+  if (line.startsWith("ERR")) showErr("Board: " + line);
+}
+
+function updateSpeed() {
+  const last = times.slice(-16);
+  const avg = last.reduce((a, b) => a + b, 0) / last.length;
+  $("ms").textContent = avg.toFixed(1);
+  $("tps").textContent = (1000 / avg).toFixed(0);
+}
+
+function drawSpark() {
+  const c = $("spark"), g = c.getContext("2d");
+  const W = c.width, H = c.height, css = getComputedStyle(document.documentElement);
+  g.clearRect(0, 0, W, H);
+  if (!times.length) return;
+  const max = Math.max(20, ...times) * 1.1, n = Math.max(times.length, 60), bw = W / n;
+  g.fillStyle = css.getPropertyValue("--bar").trim();
+  times.forEach((t, i) => {
+    const h = Math.max(2, (t / max) * (H - 4));
+    g.fillRect(i * bw + 1, H - h, Math.max(1, bw - 2), h);
+  });
+  g.fillStyle = css.getPropertyValue("--ink-3").trim();
+  g.font = "22px IBM Plex Mono, monospace";
+  g.fillText(max.toFixed(0) + " ms", 6, 24);
+}
+
+function finish() {
+  running = false;
+  $("go").disabled = !info; $("stop").disabled = true;
+  const cur = document.querySelector(".cursor"); if (cur) cur.remove();
+}
+
+$("go").addEventListener("click", async () => {
+  if (!tok || running) return;
+  showErr("");
+  const text = $("prompt").value.replace(/\s+$/, "");
+  let ids = tok.encode(text);
+  if (!ids.length) { showErr("Type the start of a story."); return; }
+  if (ids.length > info.max_prompt) ids = ids.slice(-info.max_prompt);
+  const room = info.ctx - ids.length;
+  const n = Math.max(1, Math.min(+$("len").value, room));
+  running = true; times = []; count = 0; decode = tok.decoder();
+  $("go").disabled = true; $("stop").disabled = false;
+  $("ntok").textContent = "0"; $("tps").textContent = "—"; $("ms").textContent = "—"; $("pf").textContent = "—";
+  $("out").innerHTML = "";
+  const p = document.createElement("span"); p.className = "p"; p.textContent = text;
+  const gen = document.createElement("span"); gen.id = "gen";
+  const cur = document.createElement("span"); cur.className = "cursor";
+  $("out").append(p, gen, cur);
+  drawSpark();
+  const seed = (Math.random() * 1e9) | 0;
+  await send("H 0.15");   // two-stage output layer, 15% of rows
+  await send(`G ${n} ${temp} 40 ${seed} ${tok.eot} ${ids.length} ${ids.join(" ")}`);
+});
+
+$("stop").addEventListener("click", () => { if (running) send("X"); });
+</script>
+</body>
+</html>

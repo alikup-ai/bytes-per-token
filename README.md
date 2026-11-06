@@ -2,6 +2,8 @@
 
 **A language model on an $8 ESP32-S3 at ~87 tokens/s: 8x faster than the reference port, on the same board and the same weights.**
 
+**[Try it in your browser](https://alikup-ai.github.io/bytes-per-token/)**: flash an ESP32-S3-N16R8 over USB from Chrome or Edge, then watch it write. No toolchain needed.
+
 ![esp32-ai firmware vs this engine: same board, same weights, same 200 tokens](docs/media/race.gif)
 
 <sub>Both panels replay the same 200 tokens at the speed measured on the board for each firmware
@@ -90,7 +92,8 @@ python engine/test.py esp32ai_ts                    # PC: engine vs PyTorch
 python engine/test.py esp32ai_ts --port COM6 --flash-app   # board: build, flash, check bit-exact, time it
 ```
 
-Browser demo (Chrome/Edge over Web Serial): see [`engine/demo/README.md`](engine/demo/README.md).
+Browser demo (Chrome/Edge over Web Serial): [alikup-ai.github.io/bytes-per-token](https://alikup-ai.github.io/bytes-per-token/), source in [`web/`](web/).
+The flashable images are built by `idf.py -B builddemo -D SDKCONFIG=sdkconfig.demo -DLLM_DEMO=1 build` in `engine/esp32` and `esptool merge_bin` with the model pack at 0x90000.
 Training from scratch: `train/data.py`, then `train/sweep_*.sh` (~30-50 min per model on CPU).
 
 ## Limitations
