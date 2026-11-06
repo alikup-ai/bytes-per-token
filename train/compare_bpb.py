@@ -7,8 +7,8 @@ tokenizer (stories joined by <|endoftext|>), is scored on non-overlapping 256-to
 windows, and the summed loss is divided by the UTF-8 bytes of the stories. Our QAT
 models run with their int4 fake quantization, esp32-ai with its dequantized int4
 weights: both as the engine runs them (up to int8 activations).
-Caveats: esp32-ai was trained on the first 300 MiB of TinyStories-train.txt, our models
-on another slice (see README.md), so the text is not equally "in distribution" for both;
+Caveats: esp32-ai was trained on the first 300 MiB of TinyStories-train.txt, our models on the
+first 300 MiB of TinyStoriesV2-GPT4-train.txt (see README.md), so the text is not equally "in distribution" for both;
 esp32-ai's head covers only its first 25,353 tokens (targets beyond it are counted).
 """
 import argparse

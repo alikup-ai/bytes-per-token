@@ -14,11 +14,7 @@
 | `docs/` | журнал экспериментов, отчёт |
 
 ## Данные (не в git: `data/`, `runs/`, `refs/` в `.gitignore`)
-- `data/train_part.txt` — первые 300 МиБ (ровно 314 572 800 байт, последняя история обрезана и отбрасывается)
-  train-файла TinyStories. `data/valid.txt` — 22 502 601 байт, начинается с середины истории.
-  По размеру это похоже на TinyStoriesV2-GPT4 (`roneneldan/TinyStories` на Hugging Face), но точный файл и
-  способ скачивания при старте проекта не записали. **Это пробел воспроизводимости**: при повторе
-  сверяйте размеры файлов и число токенов (`train.bin` 78 022 491, `val.bin` 5 578 295 токенов uint16).
+- `data/train_part.txt` — первые 300 МиБ (314 572 800 байт) файла `TinyStoriesV2-GPT4-train.txt`, `data/valid.txt` — `TinyStoriesV2-GPT4-valid.txt` целиком (оба из `roneneldan/TinyStories` на Hugging Face; сверено побайтно и по SHA-256 06.11.2026).
 - `data/tok4096.json`, `train.bin`, `val.bin` — `train/data.py` (BPE на 4096 токенов по первым 200k историям).
 - `data/qa_*` — `train/qa_data.py` (вопросы по сказке, правила, без другой модели).
 - `refs/esp32-ai`, `refs/esp32-tinyLLM` — клоны сравниваемых проектов (коммит esp32-ai 52ebcbb, см. `docs/phase3-esp32ai.md`).

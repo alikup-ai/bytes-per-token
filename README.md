@@ -83,7 +83,19 @@ PSRAM-backed MCU, measuring each one in bytes, and the cost model.
 
 ## Run it
 
-Hardware: ESP32-S3-N16R8 (16 MB flash, 8 MB octal PSRAM). ESP-IDF 5.5.
+**No board: check the quality numbers in ~2 minutes on a CPU.** Weights are on
+[Hugging Face](https://huggingface.co/alikup-ai/bytes-per-token):
+
+```sh
+pip install torch tokenizers safetensors huggingface_hub
+python bench_pc.py              # varC_long_s0 -> bits per byte: 0.6253
+python bench_pc.py combo_s0     # -> 0.7322
+```
+
+**With a board:** flash from the browser at [alikup-ai.github.io/bytes-per-token](https://alikup-ai.github.io/bytes-per-token/),
+or take the images from the [release](https://github.com/alikup-ai/bytes-per-token/releases).
+
+**Full pipeline** (ESP32-S3-N16R8: 16 MB flash, 8 MB octal PSRAM; ESP-IDF 5.5):
 
 ```sh
 python -m venv .venv && .venv/Scripts/pip install torch tokenizers numpy scipy pyserial esptool
@@ -94,7 +106,10 @@ python engine/test.py esp32ai_ts --port COM6 --flash-app   # board: build, flash
 
 Browser demo (Chrome/Edge over Web Serial): [alikup-ai.github.io/bytes-per-token](https://alikup-ai.github.io/bytes-per-token/), source in [`web/`](web/).
 The flashable images are built by `idf.py -B builddemo -D SDKCONFIG=sdkconfig.demo -DLLM_DEMO=1 build` in `engine/esp32` and `esptool merge_bin` with the model pack at 0x90000.
-Training from scratch: `train/data.py`, then `train/sweep_*.sh` (~30-50 min per model on CPU).
+Training from scratch: data is [roneneldan/TinyStories](https://huggingface.co/datasets/roneneldan/TinyStories):
+`data/train_part.txt` = the first 300 MiB (314,572,800 bytes) of `TinyStoriesV2-GPT4-train.txt`,
+`data/valid.txt` = `TinyStoriesV2-GPT4-valid.txt`. Then `train/data.py` and `train/sweep_*.sh`
+(~30-50 min per model on a laptop CPU at 20M tokens).
 
 ## Limitations
 
